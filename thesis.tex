@@ -1,0 +1,130 @@
+\documentclass{scrreprt}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\title{The Nut Shell}
+\subtitle{A Framework for Creating Interactive Command Line Tutorials}
+\author{Sebastian Morr}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\begin{verbatim}
+    Abstract
+        (Purpose)
+        (Design + evaluation methods)
+        (Major results)
+        (Summary of conclusions)
+    Introduction
+        (Topic: Command line tutorials)
+        (Motivation: Traditional, static tutorials have problems)
+            (Attention shift)
+            (No goal affirmation)
+            (No reaction to mistakes)
+        (Core idea: Interlace tutorial text and CLI)
+        (Role model: Text adventures)
+        (Research question: Is this approach "better"?)
+        (Prior approaches)
+            (Try Ruby/Git/Haskell)
+            (What's missing in them)
+        (Conventions in this thesis)
+    Overview
+        (Goals and principles)
+            (Basic event loop: prompt -> editing -> execution/output)
+            (Adaptability to arbitrary "targets")
+            (Annotation + environment changing, otherwise raw CLI interaction)
+        (Steps of this thesis)
+        (Diagram: Layers)
+    Design
+        Command line parser
+            Purpose
+                (Recognizing parts of command line output)
+            Background
+                (How a terminal works)
+                (Escape characters)
+                (Readline key combinations)
+            Architecture
+                (Component diagram)
+                (Parser EBNF)
+            Problems and workarounds
+                (Command line editing)
+                (...)
+        Internal DSL
+            (Purpose: High-level layer around CLI parser)
+            (Description of necessary DSL calls)
+        The nutsh language
+            Purpose
+                (Describes a self-contained teaching unit, a "lesson")
+            Design goals
+                (Easy to read and write)
+                    (Use syntax the user already knows: Regex + Go syntax)
+                    (Introduce new syntax for often-used semantics)
+                (Minimize redundance)
+                    (DRY, allow reuse of code snippets)
+            Properties
+                (String-based)
+                (Functional)
+            Lexical elements
+                (Token types)
+                (Diagram: State machine)
+            Syntax
+                (EBNF of language constructs)
+            Parsing
+                (How YACC works)
+            Semantics
+                (Specification of language constructs)
+            Interpreter
+                (State)
+                (Function stack)
+            Automated testing
+                (Motivation)
+                (Testing algorithm)
+            Examples
+    Implementation
+        Used technologies
+            (Go)
+            (kr/pty for terminal emulation)
+        High-level design
+            (Diagram: Package diagram)
+        Command line tool
+            Usage
+            Builtin functions
+    Application and evaluation
+        Methods
+            Setting
+                (Description of setting: Preparatory course for CS students)
+                (Previous teaching method)
+                (Groups)
+            Tutorial
+                (Content, examples)
+                (Best practises in lesson writing)
+            Survey
+                (Questions)
+        Results
+            (Pretty graphs)
+            (Statistical evaluation)
+    Conclusions
+        (Discussion of survey results)
+    Limitations and future directions
+        (Future directions:)
+            (Automated typo detection)
+            (Simplified prompt syntax)
+            (Lesson dependency tree)
+        (Outlook, future of the Nut Shell)
+    Acknowledgements
+        (...)
+    References
+        (...)
+    Appendix A: Example lesson
+        (nutsh source code)
+        (Execution output)
+    Appendix B: Table of terminal escape codes
+        (...)
+    Affidavit
+        ("Erklärung an Eides statt")
+\end{verbatim}
+
+\end{document}
