@@ -4,15 +4,24 @@
 \usepackage[utf8]{inputenc}
 
 \usepackage{microtype}
+\usepackage{graphicx}
 
-\title{The Nut Shell}
-\subtitle{A Framework for Creating Interactive Command Line Tutorials}
+%\titlehead{%
+%\hfill
+%{\sffamily\bfseries%
+%\makebox[\textwidth]{TECHNISCHE UNIVERSIT\"AT CAROLO-WILHELMINA ZU BRAUNSCHWEIG}}
+%}
+
+\subject{Bachelor Thesis}
+\title{The Nut Shell \\ A Framework for Creating Interactive Command Line Tutorials}
 \author{Sebastian Morr}
-\publishers{Betreuer: Dr. Werner Struckmann}
 \date{\today}
+\publishers{Betreuer: Dr. Werner Struckmann}
 
 \begin{document}
+
 \maketitle
+
 \tableofcontents
 
 \begin{abstract}
@@ -27,51 +36,47 @@
 
 \chapter{Introduction}
 
-(Topic: Command line tutorials)
+Command line interfaces are a powerful way to interact with computers, but they have a steep learning curve. An effective way to learn how to use them is by using a tutorial - (definition).
 
-(Motivation: Traditional, static tutorials have problems)
+The common way of teaching command line interfaces is a static text. This representation has several disadvantages: The users have to shift their attention forth and back between the tutorial text and the system they are learning, which could make the learning process ineffective. The text might set goals, but those aren't affirmed when they are reached. Last, when the user makes a syntactical or semantical mistake, the text does not respond to help the user fix it.
 
-    (Attention shift)
+This thesis describes a system that strives to fix those problems. The core idea is to interlace the tutorial text and the command line output so that the text can respond to the state of the command line system. This approach is inspired by text adventures.
 
-    (No goal affirmation)
+The main research question of this thesis is whether this approach is in some way "better" than the traditional text tutorials.
 
-    (No reaction to mistakes)
-
-(Core idea: Interlace tutorial text and CLI)
-
-(Role model: Text adventures)
-
-(Research question: Is this approach "better"?)
-
-(Prior approaches)
-
-    (Try Ruby/Git/Haskell)
+In the technical community, there have been several approaches in creating interactive tutorials for command line interfaces, most notably (Try Ruby/Git/Haskell).
 
     (What's missing in them)
 
-(Conventions in this thesis)
+\chapter{Architecture}
 
-\chapter{Overview}
+\section{Overview}
 
-        (Goals and principles)
+The \emph{Nut Shell} is designed to be a wrapper around a common command line process. There are several, but at the core their output can be split into three phases: Output of a prompt, composing the command, and execution/output of the command.
 
-            (Basic event loop: prompt -> editing -> execution/output)
+(Diagram of loop?)
 
-            (Adaptability to arbitrary "targets")
+(Goals and principles)
 
-            (Annotation + environment changing, otherwise raw CLI interaction)
+    (Adaptability to arbitrary "targets")
 
-        (Steps of this thesis)
+    (Annotation + environment changing, otherwise raw CLI interaction)
 
-        (Diagram: Layers)
+    This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}.
 
-\chapter{Design}
+    Design-wise, (Diagram: Layers)
 
-\section{Command line parser}
+    (impl)
+
+    (app, eval)
+
+\section{Command Line Parser}
 
 \subsection{Purpose}
 
-                (Recognizing parts of command line output)
+In this thesis, the target command line process is treated as a black box - we only capture its output and input.
+
+To recognize which commands the user entered and what the corresponding output is, we need to parse the output accordingly.
 
 \subsection{Background}
 
@@ -87,7 +92,7 @@
 
                 (Parser EBNF)
 
-\subsection{Problems and workarounds}
+\subsection{Problems and Workarounds}
 
                 (Command line editing)
 
@@ -99,13 +104,13 @@
 
             (Description of necessary DSL calls)
 
-\section{The nutsh language}
+\section{The nutsh Language}
 
 \subsection{Purpose}
 
                 (Describes a self-contained teaching unit, a "lesson")
 
-\subsection{Design goals}
+\subsection{Design Goals}
 
                 (Easy to read and write)
 
@@ -123,7 +128,7 @@
 
                 (Functional)
 
-\subsection{Lexical elements}
+\subsection{Lexical Elements}
 
                 (Token types)
 
@@ -147,7 +152,7 @@
 
                 (Function stack)
 
-\subsection{Automated testing}
+\subsection{Automated Testing}
 
                 (Motivation)
 
@@ -157,23 +162,23 @@
 
 \chapter{Implementation}
 
-\section{Used technologies}
+\section{Used Technologies}
 
             (Go)
 
             (kr/pty for terminal emulation)
 
-\section{High-level design}
+\section{High-level Design}
 
             (Diagram: Package diagram)
 
-\section{Command line tool}
+\section{Command Line Tool}
 
 \subsection{Usage}
 
-\subsection{Builtin functions}
+\subsection{Builtin Functions}
 
-\chapter{Application and evaluation}
+\chapter{Application and Evaluation}
 
 \section{Methods}
 
@@ -205,7 +210,7 @@
 
         (Discussion of survey results)
 
-\chapter{Limitations and future directions}
+\chapter{Limitations and Future Directions}
 
         (Future directions:)
 
@@ -227,13 +232,13 @@
 
 \appendix
 
-\chapter{Example lesson}
+\chapter{Example Lesson}
 
         (nutsh source code)
 
         (Execution output)
 
-\chapter{Table of terminal escape codes}
+\chapter{Table of Terminal Escape Codes}
 
         (...)
 
