@@ -3,8 +3,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
-\usepackage{microtype}
-\usepackage{graphicx}
+%\usepackage{microtype}
+%\usepackage{graphicx}
 
 %\titlehead{%
 %\hfill
@@ -25,13 +25,13 @@
 \tableofcontents
 
 \begin{abstract}
-        (Purpose)
+(Purpose)
 
-        (Design + evaluation methods)
+(Design + evaluation methods)
 
-        (Major results)
+(Major results)
 
-        (Summary of conclusions)
+(Summary of conclusions)
 \end{abstract}
 
 \chapter{Introduction}
@@ -46,11 +46,9 @@ The main research question of this thesis is whether this approach is in some wa
 
 In the technical community, there have been several approaches in creating interactive tutorials for command line interfaces, most notably (Try Ruby/Git/Haskell).
 
-    (What's missing in them)
+(What's missing in them)
 
-\chapter{Architecture}
-
-\section{Overview}
+\chapter{Overview}
 
 The \emph{Nut Shell} is designed to be a wrapper around a common command line process. There are several, but at the core their output can be split into three phases: Output of a prompt, composing the command, and execution/output of the command.
 
@@ -58,119 +56,119 @@ The \emph{Nut Shell} is designed to be a wrapper around a common command line pr
 
 (Goals and principles)
 
-    (Adaptability to arbitrary "targets")
+(Adaptability to arbitrary "targets")
 
-    (Annotation + environment changing, otherwise raw CLI interaction)
+(Annotation + environment changing, otherwise raw CLI interaction)
 
-    This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}.
+This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}.
 
-    Design-wise, (Diagram: Layers)
+Design-wise, (Diagram: Layers)
 
-    (impl)
+(impl)
 
-    (app, eval)
+(app, eval)
 
-\section{Command Line Parser}
+\chapter{Command Line Parser}
 
-\subsection{Purpose}
+\section{Purpose}
 
 In this thesis, the target command line process is treated as a black box - we only capture its output and input.
 
 To recognize which commands the user entered and what the corresponding output is, we need to parse the output accordingly.
 
-\subsection{Background}
+\section{Background}
 
-                (How a terminal works)
+        (How a terminal works)
 
-                (Escape characters)
+        (Escape characters)
 
-                (Readline key combinations)
+        (Readline key combinations)
 
-\subsection{Architecture}
+\section{Architecture}
 
-                (Component diagram)
+        (Component diagram)
 
-                (Parser EBNF)
+        (Parser EBNF)
 
-\subsection{Problems and Workarounds}
+\section{Problems and Workarounds}
 
-                (Command line editing)
+        (Command line editing)
 
-                (...)
+        (...)
 
-\section{Internal DSL}
+\chapter{Internal DSL}
 
-            (Purpose: High-level layer around CLI parser)
+    (Purpose: High-level layer around CLI parser)
 
-            (Description of necessary DSL calls)
+    (Description of necessary DSL calls)
 
-\section{The nutsh Language}
+\chapter{The nutsh Language}
 
-\subsection{Purpose}
+\section{Purpose}
 
-                (Describes a self-contained teaching unit, a "lesson")
+        (Describes a self-contained teaching unit, a "lesson")
 
-\subsection{Design Goals}
+\section{Design Goals}
 
-                (Easy to read and write)
+        (Easy to read and write)
 
-                    (Use syntax the user already knows: Regex + Go syntax)
+            (Use syntax the user already knows: Regex + Go syntax)
 
-                    (Introduce new syntax for often-used semantics)
+            (Introduce new syntax for often-used semantics)
 
-                (Minimize redundance)
+        (Minimize redundance)
 
-                    (DRY, allow reuse of code snippets)
+            (DRY, allow reuse of code snippets)
 
-\subsection{Properties}
+\section{Properties}
 
-                (String-based)
+        (String-based)
 
-                (Functional)
+        (Functional)
 
-\subsection{Lexical Elements}
+\section{Lexical Elements}
 
-                (Token types)
+        (Token types)
 
-                (Diagram: State machine)
+        (Diagram: State machine)
 
-\subsection{Syntax}
+\section{Syntax}
 
-                (EBNF of language constructs)
+        (EBNF of language constructs)
 
-\subsection{Parsing}
+\section{Parsing}
 
-                (How YACC works)
+        (How YACC works)
 
-\subsection{Semantics}
+\section{Semantics}
 
-                (Specification of language constructs)
+        (Specification of language constructs)
 
-\subsection{Interpreter}
+\section{Interpreter}
 
-                (State)
+        (State)
 
-                (Function stack)
+        (Function stack)
 
-\subsection{Automated Testing}
+\section{Automated Testing}
 
-                (Motivation)
+        (Motivation)
 
-                (Testing algorithm)
+        (Testing algorithm)
 
-\subsection{Examples}
+\section{Examples}
 
 \chapter{Implementation}
 
 \section{Used Technologies}
 
-            (Go)
+    (Go)
 
-            (kr/pty for terminal emulation)
+    (kr/pty for terminal emulation)
 
 \section{High-level Design}
 
-            (Diagram: Package diagram)
+    (Diagram: Package diagram)
 
 \section{Command Line Tool}
 
@@ -180,70 +178,68 @@ To recognize which commands the user entered and what the corresponding output i
 
 \chapter{Application and Evaluation}
 
-\section{Methods}
+\section{Setting}
 
-\subsection{Setting}
+        (Description of setting: Preparatory course for CS students)
 
-                (Description of setting: Preparatory course for CS students)
+        (Previous teaching method)
 
-                (Previous teaching method)
+        (Groups)
 
-                (Groups)
+\section{Tutorial}
 
-\subsection{Tutorial}
+        (Content, examples)
 
-                (Content, examples)
+        (Best practises in lesson writing)
 
-                (Best practises in lesson writing)
+\section{Survey}
 
-\subsection{Survey}
-
-                (Questions)
+        (Questions)
 
 \section{Results}
 
-            (Pretty graphs)
+    (Pretty graphs)
 
-            (Statistical evaluation)
+    (Statistical evaluation)
 
 \chapter{Conclusions}
 
-        (Discussion of survey results)
+(Discussion of survey results)
 
 \chapter{Limitations and Future Directions}
 
-        (Future directions:)
+(Future directions:)
 
-            (Automated typo detection)
+    (Automated typo detection)
 
-            (Simplified prompt syntax)
+    (Simplified prompt syntax)
 
-            (Lesson dependency tree)
+    (Lesson dependency tree)
 
-        (Outlook, future of the Nut Shell)
+(Outlook, future of the Nut Shell)
 
 \chapter{Acknowledgements}
 
-        (...)
+(...)
 
 \chapter{References}
 
-        (...)
+(...)
 
 \appendix
 
 \chapter{Example Lesson}
 
-        (nutsh source code)
+(nutsh source code)
 
-        (Execution output)
+(Execution output)
 
 \chapter{Table of Terminal Escape Codes}
 
-        (...)
+(...)
 
 \chapter*{Affidavit}
 
-        ("Erklärung an Eides statt")
+("Erklärung an Eides statt")
 
 \end{document}
