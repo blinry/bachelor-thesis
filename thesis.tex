@@ -54,12 +54,12 @@
 (German translation)
 \end{abstract}
 
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{0}
 \tableofcontents
 
 \chapter{Introduction}
 
-Command line interfaces are a powerful way to interact with computers, but they have a steep learning curve. An effective way to learn how to use them is by using a tutorial - (definition).
+Command line interfaces are powerful, efficient methods to interact with computers, but they often have a steep learning curve.
 
 The common way of teaching command line interfaces is a static text. This representation has several disadvantages: The users have to shift their attention forth and back between the tutorial text and the system they are learning, which could make the learning process ineffective. The text might set goals, but those aren't affirmed when they are reached. Last, when the user makes a syntactical or semantical mistake, the text does not respond to help the user fix it.
 
@@ -135,6 +135,8 @@ To allow comfortable text input, and to enable functions like command line editi
     \end{tabular}
 \end{figure}
 
+\section{Targets}
+
 (what does a target need?)
 
 (customizable prompt)
@@ -143,37 +145,39 @@ To allow comfortable text input, and to enable functions like command line editi
 
 \section{Purpose}
 
-In this thesis, the target command line process is treated as a black box - we only capture its output and input.
+In this thesis, the target command line process is treated as a black box with input and output as a stream of Unicode characters.
 
 To recognize which commands the user entered and what the corresponding output is, we need to parse the output accordingly.
 
-\section{Markers}
+To be able to differentiate between the different parts, the framework uses different markers -- these are special character sequences that don't appear in normal output. (clarify)
 
-To be able to differentiate between the different parts, the framework uses different markers - these are special character sequences that don't appear in normal output. (clarify)
-
-\subsection{Recognizing the command}
+\section{Recognizing the command}
 
 While the user edits the command line, he can use many of readline's key bindings or other shell builtin key combinations. These make it hard to impossible to recognize which command was entered, 
 
 All targets support (through readline) the key combinations Ctrl-U and Ctrl-Y, which delete the momentarily entered command and put it in a internal buffer / re-insert it. The parser waits for the user to press Enter and then sends the sequence “Ctrl-U start-marker Ctrl-Y end-marker Enter” to the underlying process. The result is that the entered command is appearing in the output cleanly framed by the two markers, while the output looks the same to the user.
 
-\subsection{Interactivity}
+(diagram: example)
+
+\section{Interactivity}
 
 The CLI can start other programs which run in the foreground, that is, wait for the user to enter text. We call these programs \emph{interactive}. Examples are text editors or pagers, that show a long text and allow the user to scroll up and down. With this kind of prompt you cannot wait for the command to finish, but you have to show the output to the user beforehand, so he can interact with it.
 
 The parser solves this by using a timer: If a command runs longer than (x) milliseconds, it switches to \emph{interactive mode}, which show the output directly.
 
-\subsection{Recognizing the Prompt}
+\section{Recognizing the Prompt}
 
 The prompt is configured to start and end with a marker. This leads to problems when the user tries to reconfigure the prompt.
 
-\subsection{Multi line commands}
+\section{Multi Line Commands}
 
 The are CLIs which recognize that a command is incomplete. In this case, they do not send the command, but give the user the possibility to complete it. Usually, the CLI displays a second, special prompt in this case. The parser inserts markers there, too, so that it can be differeniated from a normal prompt.
 
 After the above enter handling, the parser looks at the next character - if it is a secondary-prompt-marker, it falls back to command-editing mode. In the end all such part-command-lines are appended to get the full command.
 
 \section{Architecture}
+
+Putting it all together:
 
 (Component diagram)
 
@@ -216,15 +220,13 @@ The \emph{nutsh} language is designed to describe a self-contained teaching unit
 
 \section{Design Goals}
 
-(Easy to read and write)
+Lesson files should be as easy to read and to write as possible.
 
-    (Use syntax the user already knows: Regex + Go syntax)
+The author decided to use a syntax close to the ones potential users will already know, that is, regular expressions and for the rest a syntax similar to Go. C users will also feel at home.
 
-    (Introduce new syntax for often-used semantics)
+The language contain syntactic structures that support often-used semantical statements.
 
-(Minimize redundance)
-
-    (DRY, allow reuse of code snippets)
+Redundance should be minimized -- the language should contain possibilities to reuse code snippets to avoid repeating them.
 
 \section{Properties}
 
