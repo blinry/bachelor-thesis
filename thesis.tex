@@ -1,7 +1,7 @@
-\documentclass[twoside]{scrreprt}
+\documentclass[twoside,blue]{tubsreprt}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
 
 \usepackage{soul}
 \sethlcolor{darkgray}
@@ -39,14 +39,19 @@
 \titlehead{\sffamily\bfseries\centerline{BRAUNSCHWEIG UNIVERSITY OF TECHNOLOGY}\centerline{Institute for Programming und Reactive Systems}}
 
 \subject{Bachelor Thesis}
-\title{The Nut Shell -- A Framework \\ for Creating Interactive \\ Command Line Tutorials}
+\title{The Nut Shell}
+\subtitle{A Framework for Creating Interactive Command Line Tutorials}
 \author{Sebastian Morr \texttt{<sebastian@morr.cc>}}
 \date{2013-11-03}
 \publishers{\textbf{Thesis Advisors:} \\ Prof. Dr. Ursula Goltz \\ (Zweitprüfer) \\ Dr. Werner Struckmann}
+\logo{\includegraphics{dummy_institut.pdf}}
+\titleabstract{\lipsum[2]}
+\titlepicture{infozentrum.jpg}
 
 \begin{document}
 
-\maketitle
+\maketitle[image,logo=right]
+\makebackpage[trisec]
 
 \begin{abstract}
 (Purpose)
