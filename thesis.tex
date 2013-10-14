@@ -3,25 +3,38 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
+\usepackage{soul}
+\sethlcolor{darkgray}
+\newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
+\newcommand{\cursor}{\invert{ }}
+\newcommand{\escape}[1]{\textasciicircum #1}
+
 \usepackage{microtype}
+\DisableLigatures[<,>]{encoding=T1,family=tt*}
+
 \usepackage[hidelinks]{hyperref}
 %\usepackage{savetrees}
 
+\usepackage[os=win]{menukeys}
 \usepackage{syntax}
+\usepackage{listings}
+\renewmenumacro{\keys}[+]{shadowedroundedkeys}
+\usepackage{array}
+\newcolumntype{t}{>{\ttfamily}l}
 %\usepackage{graphicx}
 
-% fix "syntax" package
-\makeatletter
-\def\gr@implitem#1<#2> #3 {%
-   \sbox\z@{\hskip\labelsep\grammarlabel{#2}{#3}}%
-   \strut\@@par%
-   \vskip-\parskip%
-   \vskip-\baselineskip%
-   \hrule\@height\z@\@depth\z@\relax%
-   \item[\unhbox\z@]%
-   \catcode`\<\active%
+%\include{fix-syntax.tex}
+
+\lstset{
+    aboveskip=20pt,
+    belowskip=20pt,
+    basicstyle=\small\sffamily,
+    %numbers=left,
+    numberstyle=\tiny,
+    frame=tb,
+    columns=fullflexible,
+    showstringspaces=false
 }
-\makeatother
 
 %\titlehead{%
 %\hfill
@@ -103,29 +116,42 @@ To find out whether this teaching approach has benefits, the framework was appli
 
 \section{Command Line Interface}
 
-A \emph{Command Line Interface} (\textsc{CLI}) allows a user to communicate with a computer program by entering lines of text, the so-called \emph{command lines}. Although some have graphical capabilities (src), we want to restrict ourselves to purely character-based interfaces here.
+A \emph{Command Line Interface} (\textsc{CLI}) allows a user to communicate with a computer program by entering lines of text, the so-called \emph{command lines}. Although some have graphical capabilities (src), this thesis focuses on purely character-based interfaces.
 
 Commonly, interaction with a \textsc{CLI} can be seperated into three phases:
 
-\begin{itemize}
-    \item The program writes a \emph{prompt}, which is the signal for users that they now can enter a command.
-    \item The user composes a command line, often using several editing capabilities the CLI offers. To tell the computer to execute the command, often a \emph{return} character is sent.
-    \item The program executes the command and prints a response. Sometimes, the execution is interactive (ref reaktive systeme) and does not return until the user tells the program to. After the command has finished, the loop starts again.
-\end{itemize}
+\begin{enumerate}
+    \item The program writes a \emph{prompt}, which a special character sequence that signals that the program now accepts a command.
+    \item The user composes a command line, often using several editing capabilities offered by the CLI. To tell the program to execute the command, the \emph{return} character is used. (rlly?)
+    \item The program executes the command and prints a response. Sometimes, the execution is interactive (ref reaktive systeme) and does not return until the user tells the program to. After the command has finished, the first phase is entered again.
+\end{enumerate}
+
+Here is an example of one iteration of these phases.\footnote{The \textsc{CLI} in this case is an \emph{Interactive Ruby Shell}.} The \texttt{>\->} is the prompt, the \texttt{2**10} is the command line entered by the user, and the \texttt{1024} is the command's output:
+
+\begin{lstlisting}
+>> 2**10
+1024
+\end{lstlisting}
 
 \section{Terminal}
 
-(past)
+In the past, a \emph{computer terminal} was a device that was used to communicate with mainframe computers. They read text from the user via a keyboard and displayed the computer's output, first on paper, later on a screen. (src: wiki)
 
-Here, when we use the term \emph{terminal}, we mean a modern \emph{terminal emulator}, a program that emulates a terminal within another environment.
+Here, when we use the term \emph{terminal}, we mean a modern \emph{terminal emulator}, a program that resembles a terminal within an otherwise graphical environment. Inside of these terminal emulators, \textsc{CLI}s can be used.
+
+Terminals communicate through sequential streams of characters: They receive characters from a program to be displayed, and they receive characters from the user's keyboard, which they send back to the program.
 
 \subsection{Escape codes}
 
-Printable characters can be sent to the terminal and will be printed. To do more advanced display actions, \emph{escape codes} are used.
+A classical computer terminal was the \textsc{VT100}, introduced 1978 by \textsc{Digital Equipment Corporation}. Its behaviour is nowadays emulated by modern terminal emulators. The device had a mechanism for doing graphical output: By sending special character sequences, the terminal performed special actions like moving the cursor, deleting characters on the screen or turning graphical modes (underlining, different colors) on and off. The \textsc{VT100} supported the escape sequences defined in ANSI X3.64 (ref), also called the \emph{ANSI escape sequences}.
+
+(...)
 
 \subsection{Readline}
 
 To allow comfortable text input, and to enable functions like command line editing or a command history, many (quot) programs use a library called \emph{readline}. This library has some default keybindings, of which we utilize the following:
+
+(come from emacs)
 
 \begin{figure}
     \begin{tabular}{r|r}
@@ -140,30 +166,67 @@ To allow comfortable text input, and to enable functions like command line editi
 (what does a target need?)
 
 (customizable prompt)
+(readline)
 
 \chapter{Command Line Parser}
 
-\section{Purpose}
+The purpose of the Command Line Parser is to recognize the different parts of the interaction with a running command line process. To do this, it wraps around the \textsc{CLI} process, watches and modifies its input and output. This way, it provides a common interface to arbitrary targets.
 
-In this thesis, the target command line process is treated as a black box with input and output as a stream of Unicode characters.
+The interesting parts in this context are the following, which correspond to the three phases described in (ref):
 
-To recognize which commands the user entered and what the corresponding output is, we need to parse the output accordingly.
+\begin{enumerate}
+    \item Which prompt is displayed to the user?
+    \item Which command is entered?
+    \item What is the output of this command?
+\end{enumerate}
 
-To be able to differentiate between the different parts, the framework uses different markers -- these are special character sequences that don't appear in normal output. (clarify)
+In this thesis, the target command line process is treated as a black box having both input and output streams of Unicode characters. To recognize which commands the user entered and what the corresponding output is, the framework needs to parse the output accordingly.
+
+For this purpose, we use two special \emph{markers}, which enable the parser to recognise the different parts. These are special character sequences that don't appear in normal output. (clarify)
 
 \section{Recognizing the command}
 
-While the user edits the command line, he can use many of readline's key bindings or other shell builtin key combinations. These make it hard to impossible to recognize which command was entered, 
+While the user edits the command line, they can use many of readline's key bindings or other shell builtin key combinations. These make it hard to recognize which command was entered, as parts of the entered characters could have been deleted or otherwise changed. To solve this, we use a mechanism to repeat the entered line before it is sent.
 
-All targets support (through readline) the key combinations Ctrl-U and Ctrl-Y, which delete the momentarily entered command and put it in a internal buffer / re-insert it. The parser waits for the user to press Enter and then sends the sequence “Ctrl-U start-marker Ctrl-Y end-marker Enter” to the underlying process. The result is that the entered command is appearing in the output cleanly framed by the two markers, while the output looks the same to the user.
+All targets support (by definition, through Readline) the keyboard shortcuts \keys{\ctrl+U} and \keys{\ctrl+Y}, which delete the momentarily entered command and put it in a internal buffer / re-insert it. The parser waits for the user to press Enter and then sends the sequence
 
-(diagram: example)
+\begin{quote}
+    \keys{\ctrl+U} marker \keys{\backspace} \keys{\ctrl+Y} marker \keys{\backspace} \keys{\return}
+\end{quote}
+
+to the underlying process. The result is that the entered command is appearing in the output cleanly framed by the two markers, while the output looks the same to the user.
+
+Here is a demonstration of this technique. The first column lists the user's keystrokes, the second one contains the characters sent to the process, the third one contains the output of the process, and the last one shows the current content of the terminal.
+
+\begin{tabular}{l|l|l|l}
+    Keystrokes & Input & Output & Screen content \\
+    \hline
+    & & \texttt{>>␣} & \texttt{>>␣\cursor} \\
+    \keys{1} \keys{-} \keys{1} & \texttt{1-1} & \texttt{1-1} & \texttt{>>␣1-1\cursor} \\
+    \keys{\arrowkeyleft} & \texttt{\escape{[}[D} & \texttt{\escape{H}} & \texttt{>>␣1-\invert{1}} \\
+    \keys{backspace} & \texttt{\escape{H}} & \texttt{\escape{H}} & \texttt{>>␣1\invert{-}1} \\
+    & & \texttt{\escape{[}[1P} & \texttt{>>␣1\invert{1}} \\
+    \keys{{+}} & \texttt{+} & \texttt{+} & \texttt{>>␣1+\cursor} \\
+    & & \texttt{1} & \texttt{>>␣1+1\cursor} \\
+    & & \texttt{\escape{H}} & \texttt{>>␣1+\invert{1}} \\
+    \keys{\return} & \texttt{\escape{E}} & \texttt{\escape{[}[C} & \texttt{>>␣1+1\invert{ }} \\
+    & \texttt{␣} & \texttt{␣} & \texttt{>>␣1+1␣\invert{ }} \\
+    & \texttt{\escape{U}} & \texttt{\escape{H}\escape{H}\escape{H}\escape{H}} & \texttt{>>␣\invert{1}+1␣} \\
+    & & \texttt{\escape{[}[K} & \texttt{>>␣\invert{ }} \\
+    & \texttt{\{marker\}} & \texttt{\{marker\}} & \texttt{>>␣\{marker\}\invert{ }} \\
+    & \texttt{\escape{H}} & \texttt{\escape{H}\escape{[}[K} & \texttt{>>␣\invert{ }} \\
+    & \texttt{\escape{Y}} & \texttt{1+1␣} & \texttt{>>␣1+1␣\invert{ }} \\
+    & \texttt{\{marker\}\escape{H}} & \texttt{\{marker\}\escape{H}\escape{[}[K} & \texttt{>>␣1+1␣\invert{ }} \\
+    & \texttt{\escape{H}} & \texttt{\escape{H}\escape{[}[K} & \texttt{>>␣1+1\invert{ }} \\
+\end{tabular}
+
+The full output of this sequence is (...), and by taking the characters between the markers and discarding the first two (for deletion of the marker itself) and the last (the space) we get the exact command line the user wishes to send.
 
 \section{Interactivity}
 
-The CLI can start other programs which run in the foreground, that is, wait for the user to enter text. We call these programs \emph{interactive}. Examples are text editors or pagers, that show a long text and allow the user to scroll up and down. With this kind of prompt you cannot wait for the command to finish, but you have to show the output to the user beforehand, so he can interact with it.
+The \textsc{CLI} can start other programs which run in the foreground, that is, wait for the user to enter text. These programs are called \emph{interactive}. Examples are text editors or pagers, that show a long text and allow the user to scroll up and down. With this kind of prompt you cannot wait for the command to finish, but you have to show the output to the user beforehand, so they can interact with it.
 
-The parser solves this by using a timer: If a command runs longer than (x) milliseconds, it switches to \emph{interactive mode}, which show the output directly.
+The parser solves this by using a timer: If a command runs longer than (x) milliseconds, that is, when the parser waits longer than that for a marker, it switches to \emph{interactive mode}, which shows the output directly.
 
 \section{Recognizing the Prompt}
 
@@ -171,7 +234,7 @@ The prompt is configured to start and end with a marker. This leads to problems 
 
 \section{Multi Line Commands}
 
-The are CLIs which recognize that a command is incomplete. In this case, they do not send the command, but give the user the possibility to complete it. Usually, the CLI displays a second, special prompt in this case. The parser inserts markers there, too, so that it can be differeniated from a normal prompt.
+The are \textsc{CLI}s which recognize that a command is incomplete. In this case, they do not send the command, but give the user the possibility to complete it. Usually, the CLI displays a second, special prompt in this case. The parser inserts markers there, too, so that it can be differeniated from a normal prompt.
 
 After the above enter handling, the parser looks at the next character - if it is a secondary-prompt-marker, it falls back to command-editing mode. In the end all such part-command-lines are appended to get the full command.
 
@@ -185,32 +248,56 @@ Putting it all together:
 
 %blabla \synt{command} blabla \lit{bla}
 
+The output of the process consists of three phases: The prompt with the markers, the composing of the command (which can include escape sequences for editing, or can consist of several lines), and the command's output:
+
 \begin{grammar}
-<process_output> ::= \{ <command_output> <prompt_with_markers> <command> \}
+<process_output> ::= \{ <prompt_with_markers> <command_composing> <command_output> \}
+\end{grammar}
 
-<command_output> ::= \{ <non_marker_character> \}
+The prompt begins and ends with markers, which may not appear inbetween:
 
+\begin{grammar}
 <prompt_with_markers> ::= <marker> <prompt> <marker>
 
 <prompt> ::= \{ <non_marker_character> \}
 
-<command> ::= <command_composing> <command_echo> [\{ <prompt2_with_markers>  <command_composing>  <command_echo> \}]
+<non_marker_character> ::= everything but marker/marker2
+\end{grammar}
 
-<command_composing> ::= \{ <non_marker_character> \}
+The composing phase begins with a composing sequence, where the user enters and edits a line, optionally followed by more lines, each preceeded by a secondary prompt:
 
-<command_echo> ::= <deletition> <marker> <deletion>  <command>  <marker>  <deletion>  <enter_character>
+\begin{grammar}
+<command_composing> ::= <composing_and_echo> [\{ <prompt2_with_markers> <composing_and_echo> \}]
+
+<prompt2_with_markers> ::= <marker2> <prompt> <marker2>
+\end{grammar}
+
+The composing sequence has two phases: In the first one, the actual line composing takes place. In the second one, the current line is deleted and reprinted. The latter phase happens as described in (ref) above: The line is deleted, a marker is sent and deleted, the command is printed, a second marker is print and deleted, and a newline is sent:
+
+\begin{grammar}
+<composing_and_echo> ::= <line_composing> <command_echo>
+
+<line_composing> ::= \{ <non_marker_character> \}
+
+<command_echo> ::= <deletition> <marker> <deletion> <command> <marker> <deletion> <newline>
 
 <deletition> ::= \{ <deletition_character> \}
 
-<prompt2_with_markers> ::= <marker2> <prompt> <marker2>
+<deletition_character> ::= \lit{\textasciicircum W} | \lit{\textasciicircum K} | ...
 
-<non_marker_character> ::= everything but marker/marker2
-
-<enter_character> ::= \lit{\textbackslash r}
+<newline> ::= \lit{\textbackslash r}
 \end{grammar}
-%<deletition_character> ::= '^W' | '^K' | ...
+
+Finally, the command output simply consists of non marker characters:
+
+\begin{grammar}
+<command_output> ::= \{ <non_marker_character> \}
+\end{grammar}
+
 %<marker> ::= '☃'
 %<marker2> ::= '★'
+
+(example)
 
 \chapter{The nutsh Language}
 
@@ -260,7 +347,7 @@ nutsh does not have variables, which makes the language functional.
 
 \section{Automated Testing}
 
-To check that the lessons work, the tutorial's author needs a method to test the correctness of the lessons automatically, so he doesn't have to enter all the commands by hand.
+To check that the lessons work, the tutorial's author needs a method to test the correctness of the lessons automatically, so they doesn't have to enter all the commands by hand.
 
 (c0/c1)...
 
@@ -341,11 +428,13 @@ Heike Laschin?
 Moritz Mühlhausen
 Markus Reschke
 Werner Struckmann
+Wolfgang Morr
 Leslie Wöhler
 
 \chapter{References}
 
 Unix Power Tools
+wikipedia: backspace
 
 \appendix
 
