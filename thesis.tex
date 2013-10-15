@@ -1,16 +1,13 @@
-\documentclass[twoside,blue]{tubsreprt}
+\documentclass[twoside,11pt,blue]{tubsreprt}
 
 %\usepackage[T1]{fontenc}
-\usepackage[utf8x]{inputenc}
+\usepackage[utf8]{inputenc}
 
 \usepackage{soul}
 \sethlcolor{darkgray}
 \newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
 \newcommand{\cursor}{\invert{ }}
 \newcommand{\escape}[1]{\textasciicircum #1}
-
-\usepackage{microtype}
-\DisableLigatures[<,>]{encoding=T1,family=tt*}
 
 \usepackage[hidelinks]{hyperref}
 %\usepackage{savetrees}
@@ -19,6 +16,9 @@
 \usepackage{syntax}
 \usepackage{listings}
 \renewmenumacro{\keys}[+]{shadowedroundedkeys}
+
+\usepackage{microtype}
+\DisableLigatures[<,>]{family=tt*}
 
 \lstset{
     aboveskip=20pt,
@@ -39,21 +39,12 @@
 \titlehead{\sffamily\bfseries\centerline{BRAUNSCHWEIG UNIVERSITY OF TECHNOLOGY}\centerline{Institute for Programming und Reactive Systems}}
 
 \subject{Bachelor Thesis}
-\title{The Nut Shell}
-\subtitle{A Framework for Creating Interactive Command Line Tutorials}
-\author{Sebastian Morr \texttt{<sebastian@morr.cc>}}
+\title{\huge The Nut Shell - A Framework for Creating Interactive Command Line Tutorials}
+\author{Sebastian Morr}
 \date{2013-11-03}
 \publishers{\textbf{Thesis Advisors:} \\ Prof. Dr. Ursula Goltz \\ (Zweitprüfer) \\ Dr. Werner Struckmann}
-\logo{\includegraphics{dummy_institut.pdf}}
-\titleabstract{\lipsum[2]}
-\titlepicture{infozentrum.jpg}
-
-\begin{document}
-
-\maketitle[image,logo=right]
-\makebackpage[trisec]
-
-\begin{abstract}
+\logo{\includegraphics{ips.png}}
+\titleabstract{
 (Purpose)
 
 (Design + evaluation methods)
@@ -65,7 +56,15 @@
 \vspace{8em}
 
 (German translation)
-\end{abstract}
+}
+\titlepicture{infozentrum.jpg}
+
+\address{}
+
+\begin{document}
+
+\maketitle[imagetext]
+\makebackpage[trisec]
 
 \setcounter{tocdepth}{0}
 \tableofcontents
