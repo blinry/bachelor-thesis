@@ -1,48 +1,49 @@
-\documentclass[twoside,parskip]{scrreprt}
+\documentclass[a4paper,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage[ngerman,english]{babel}
 
-\usepackage{url}
+\usepackage{blindtext}
+\usepackage{upquote}
+
 \usepackage{soul}
-\sethlcolor{darkgray}
-\newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
-\newcommand{\cursor}{\invert{ }}
-\newcommand{\escape}[1]{\textasciicircum #1}
-
+    \sethlcolor{darkgray}
+    \newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
+    \newcommand{\cursor}{\invert{ }}
+    \newcommand{\escape}[1]{\textasciicircum #1}
 \usepackage[hidelinks]{hyperref}
-%\usepackage{savetrees}
-
 \usepackage[os=win]{menukeys}
+    \renewmenumacro{\keys}[+]{shadowedroundedkeys}
 \usepackage{syntax}
-\usepackage{listings}
-\renewmenumacro{\keys}[+]{shadowedroundedkeys}
-
 %\usepackage{courier}
 \usepackage{microtype}
-\DisableLigatures[<,>]{family=tt*}
+    \DisableLigatures[<,>]{family=tt*}
+\usepackage{geometry}
+\usepackage{listings}
+    \lstdefinelanguage{nutsh}{
+        morekeywords={if,else,prompt,def,break,return},
+        sensitive=false,
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]"
+    }
+    \lstset{
+        language=nutsh,
+        aboveskip=20pt,
+        belowskip=20pt,
+        xleftmargin=\parindent,
+        basicstyle=\ttfamily,
+        %numbers=left,
+        %numberstyle=\tiny,
+        frame=tbrl,
+        columns=fullflexible,
+        showstringspaces=false
+    }
 
-\lstdefinelanguage{nutsh}{
-    morekeywords={if,else,prompt,def,break,return},
-    sensitive=false,
-morecomment=[l]{//},
-morecomment=[s]{/*}{*/},
-morestring=[b]"
-}
-
-\lstset{
-    language=nutsh,
-    aboveskip=20pt,
-    belowskip=20pt,
-    xleftmargin=\parindent,
-    basicstyle=\ttfamily,
-    %numbers=left,
-    %numberstyle=\tiny,
-    %frame=tb,
-    columns=fullflexible,
-    showstringspaces=false
-}
+\graphicspath{images/}
+% figure: tb für kleie, p für eigene Seite
 
 \titlehead{\sffamily\bfseries\centerline{Braunschweig University of Technology}\centerline{Institute for Programming and Reactive Systems}}
 
@@ -50,19 +51,26 @@ morestring=[b]"
 \title{The Nut Shell - A Framework for Creating Interactive Command Line Tutorials}
 \author{Sebastian Morr \texttt{<sebastian@morr.cc>}}
 \date{2013-11-03}
-\publishers{\textbf{Thesis Advisors:} \\ Prof. Dr. Ursula Goltz \\ (Zweitprüfer) \\ Dr. Werner Struckmann}
+\publishers{\textbf{Advisor:} Dr. Werner Struckmann}
+\uppertitleback{I hereby declare that this thesis is my own unaided work. All sources used are acknowledged as references.
 
+\vspace{2cm}
+
+Braunschweig, 2013-11-03 \dotfill}
+\lowertitleback{This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The text is set using the \textsc{Latin Modern} font family.}
 \begin{document}
 
+\newgeometry{left=2cm,right=2cm}
 \maketitle
+\restoregeometry
 
-\chapter*{Declaration of Authorship}
-
-I hereby declare that this thesis is my own unaided work. All sources used are acknowledged as references.
-
-Braunschweig, 2013-11-03 \dotfill
+\clearpage
+\pagenumbering{roman}
 
 \begin{abstract}
+
+    \blindtext
+
     (Purpose)
 
     (Design + evaluation methods)
@@ -70,14 +78,21 @@ Braunschweig, 2013-11-03 \dotfill
     (Major results)
 
     (Summary of conclusions)
+\end{abstract}
 
-    \vspace{8em}
+\selectlanguage{ngerman}%
+\begin{abstract}
+    \blindtext
 
     (German translation)
 \end{abstract}
+\selectlanguage{english}%
 
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
 
 \chapter{Introduction}
 
@@ -121,7 +136,7 @@ Implementation details follow in (ch x).
 
 To find out whether this teaching approach has benefits, the framework was applied and evaluated in an eight-day study with about xx participants, this is described in (ch x).
 
-\subsection{Notation}
+\section{Notation}
 
 For specifying a grammar, we use EBNF:
 
@@ -137,6 +152,21 @@ For specifying a grammar, we use EBNF:
 \end{lstlisting}
 
 (descr)
+
+\section{Acknowledgements}
+
+I would like to thank the following people for their support in the creation of this thesis:
+
+Hauke Baller,
+Arne Brüsch,
+Hendrik Freytag,
+Heike Laschin,
+Moritz Mühlhausen,
+Markus Reschke,
+Werner Struckmann,
+Wolfgang Morr,
+Leslie Wöhler
+
 
 \chapter{Preliminaries}
 
@@ -347,17 +377,17 @@ nutsh does not have variables, which makes the language functional.
 
 \section{Lexical Elements}
 
-\subsection{Comments}
+\minisec{Comments}
 
 \emph{nutsh} has two types of comments, which are common in C-like languages: \emph{Line comments} start with \texttt{//} and stop at the end of the line, \emph{block comments} start with \texttt{/*} and end with \texttt{*/}.
 
 Comments are ignored.
 
-\subsection{White space}
+\minisec{White space}
 
 Whites space (newlines, carriage returns, tabs and spaces) seperates tokens but has no meaning otherwise.
 
-\subsection{Identifiers}
+\minisec{Identifiers}
 
 Identifiers serve as names that can be used to define and call functions. An identifier is a non-empty sequence of alphanumeric characters.
 
@@ -365,7 +395,7 @@ Identifiers serve as names that can be used to define and call functions. An ide
 Identifier = letter { letter } .
 \end{lstlisting}
 
-\subsection{Keywords}
+\minisec{Keywords}
 
 \emph{nutsh} uses the keywords \texttt{break}, \texttt{def}, \texttt{else}, \texttt{if}, \texttt{prompt}, and \texttt{return}, which may not be used as identifiers.
 
@@ -383,13 +413,9 @@ The following character sequences have special meanings: \texttt{=\~},
 \texttt{\}}, and
 \texttt{\&\&}.
 
-\subsection{String Literals}
+\minisec{String Literals}
 
-There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}.
-
-Raw string literals are enclosed with back quotes (\texttt{`}). They mean contain any character except the back quote; the characters are interpreted literally.
-
-Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes.
+There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}. Raw string literals are enclosed with back quotes (\texttt{\`}). They mean contain any character except the back quote; the characters are interpreted literally. Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes.
 
 \begin{lstlisting}
     string = raw_string | interpreted_string .
@@ -399,84 +425,60 @@ Interpreted string literals are enclosed with double quotes (\texttt{"}) and may
 
 ((nur?) ref)
 
-\section{Syntax}
+\section{Statements}
 
-\subsection{Basics}
+\minisec{If Statements}
 
-The nutsh language is based heavily on Strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, you can check whether a string matches a regular expression (\texttt{"foo" =~ "f.."}) (flavor). Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common logic operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or} are defined accordingly. They return the arbitrary String \texttt{"true"} for a truth value.
-
-There are the control flow structures \emph{if-else} as well as \emph{prompt}, and you can define and call function. Variables are not neccessary, as you can define them in the target language.
-
-There are typical C-comments (\texttt{//} for line comments, \texttt{/* ... */} for block comments).
-
-\subsection{Basic Commands}
-
-A central command is the output of explanation text. This text will be displayed indented and highlighted in a different color.
+The syntax of \emph{nutsh}'s is inspired by Go's -- there are no brackets around the condition.
 
 \begin{lstlisting}
-say("This is explaining text.")
+    IfStatement = "if" StringExpression Block ( "else" Block ) .
 \end{lstlisting}
 
-Because this command is used so often, it can be abbreviated to:
+In the following example, ...
 
 \begin{lstlisting}
-"This is the short form."
-\end{lstlisting}
-
-To execute a command in the target process, you use \texttt{run()}. Value of this statement is the command's output.
-
-\begin{lstlisting}
-run("1+1")
-\end{lstlisting}
-
-\subsection{Control Flow}
-
-Central is the prompt loop:
-
-\begin{lstlisting}
-prompt {
-    // commands
-}
-\end{lstlisting}
-
-It has the semantic of an endless loop, where at the beginning of each pass a command is read from the user. It can be left with a \texttt{break} statement.
-
-There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the last user command and its output.
-
-The language has \texttt{if-else} expressions, whose syntax is influenced by Go (no brackets around the expression):
-
-\begin{lstlisting}
-if command =~ "42" {
-    "Your command contained the number 42."
+if "test" == "test" {
+    "Everything is OK."
 } else {
-    "Your command did not contain the number 42."
+    "Wait, what?"
 }
 \end{lstlisting}
 
-\subsection{Functions}
+\minisec{Prompt Statements}
 
-To reuse code snippets, you can put them into functions:
+The prompt statement is a central piece of \emph{nutsh}'s syntax. It has the semantic of an endless loop, where a command is read from the user at the beginning of each pass. It can be left with a \texttt{break} statement.
 
-\begin{lstlisting}[mathescape]
-def exit_status {
-    return(run("echo $\$$?"))
-}
-
-def say_twice(text) {
-    say(text)
-    say(text)
-}
-
-prompt {
-    say_twice("The exit status was '"+exit_status+"'")
-}
+\begin{lstlisting}
+    PromptStatement = "prompt" Block .
 \end{lstlisting}
 
-Functions without arguments can be called without brackets as well.
+There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the last user command and its output. When no prompt has been entered yet, they return empty strings.
 
-\subsection{Umgebende Zustände}
+In this example, the user is asked to enter an command that has the output "42". When he does that, the prompt loop is left, otherwise they has to try again:
+
+\begin{lstlisting}
+    "Please calculate the product of 6 and 7."
+
+    prompt {
+        if output == "42" {
+            break
+        } else {
+            "Please try again."
+        }
+    }
+\end{lstlisting}
+
+\minisec{State Statements}
 
 If you want to check the same condition for a group of prompt statements, you can use this syntax:
+
+\begin{lstlisting}
+    State = Calls Block .
+    Calls = Call { "," Call } .
+\end{lstlisting}
+
+Example:
 
 \begin{lstlisting}
 def help {
@@ -541,6 +543,60 @@ stay_in("/tmp"), help {
 }
 \end{lstlisting}
 
+%\subsection{Basics}
+%
+%The nutsh language is based heavily on Strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, you can check whether a string matches a regular expression (\texttt{"foo" =~ "f.."}) (flavor). Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common logic operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or} are defined accordingly. They return the arbitrary String \texttt{"true"} for a truth value.
+%
+%There are the control flow structures \emph{if-else} as well as \emph{prompt}, and you can define and call function. Variables are not neccessary, as you can define them in the target language.
+%
+%There are typical C-comments (\texttt{//} for line comments, \texttt{/* ... */} for block comments).
+%
+%\subsection{Basic Commands}
+%
+%A central command is the output of explanation text. This text will be displayed indented and highlighted in a different color.
+%
+%\begin{lstlisting}
+%say("This is explaining text.")
+%\end{lstlisting}
+%
+%Because this command is used so often, it can be abbreviated to:
+%
+%\begin{lstlisting}
+%"This is the short form."
+%\end{lstlisting}
+%
+%To execute a command in the target process, you use \texttt{run()}. Value of this statement is the command's output.
+%
+%\begin{lstlisting}
+%run("1+1")
+%\end{lstlisting}
+%
+%\subsection{Control Flow}
+%
+%\subsection{Functions}
+%
+%To reuse code snippets, you can put them into functions:
+%
+%\begin{lstlisting}[mathescape]
+%def exit_status {
+%    return(run("echo $\$$?"))
+%}
+%
+%def say_twice(text) {
+%    say(text)
+%    say(text)
+%}
+%
+%prompt {
+%    say_twice("The exit status was '"+exit_status+"'")
+%}
+%\end{lstlisting}
+%
+%Functions without arguments can be called without brackets as well.
+%
+%\subsection{Umgebende Zustände}
+%
+
 \subsection{Grammar}
 
 \begin{lstlisting}
@@ -550,10 +606,6 @@ stay_in("/tmp"), help {
     Arguments = "(" [ identifier { "," identifier } ] ")" .
     Block = "{" { Line } "}" .
     Line = IfStatement | PromptStatement | State | Call | string .
-    IfStatement = "if" StringExpression Block ( "else" Block ) .
-    PromptStatement = "prompt" Block .
-    State = Calls Block .
-    Calls = Call { "," Call } .
     Call = identifier [ "(" [ StringExpressions ] ")" ] .
     StringExpressions = StringExpression { "," StringExpression } .
     StringExpression =
@@ -586,24 +638,6 @@ To check that the lessons work, the tutorial's author needs a method to test the
 (Testing algorithm)
 
 \section{Examples}
-
-\chapter{Implementation}
-
-\section{Used Technologies}
-
-The framework was implemented in Go (src), a compiled, statically typed language, which is seen by many as a modern successor to C.
-
-(kr/pty for terminal emulation)
-
-\section{High-level Design}
-
-(Diagram: Package diagram)
-
-\section{Command Line Tool}
-
-\subsection{Usage}
-
-\subsection{Builtin Functions}
 
 \chapter{Application and Evaluation}
 
@@ -694,31 +728,7 @@ Right now, typing errors can be catched by defining some command-rules by hand. 
 
 I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it.
 
-\chapter*{Acknowledgements}
-
-I would like to thank the following people for their support in the creation of this thesis:
-
-Hauke Baller,
-Arne Brüsch,
-Hendrik Freytag,
-Heike Laschin,
-Moritz Mühlhausen,
-Markus Reschke,
-Werner Struckmann,
-Wolfgang Morr,
-Leslie Wöhler
-
-\chapter{References}
-
-Unix Power Tools
-wikipedia: backspace
-ansi
-vt100
-The author of this paper designed a Nut Shell tutorial to teach the bash shell.
-
-ebnf
-tree evaluation
-statistical method
+\part*{Appendix}
 
 \appendix
 
@@ -730,10 +740,53 @@ statistical method
 
 \chapter{Implementation}
 
+\section{Used Technologies}
+
+The framework was implemented in Go (src), a compiled, statically typed language, which is seen by many as a modern successor to C.
+
+(kr/pty for terminal emulation)
+
     limesurvey
+
+\section{High-level Design}
+
+(Diagram: Package diagram)
+
+\section{Command Line Tool}
+
+\subsection{Usage}
+
+\subsection{Builtin Functions}
+
 
 \chapter{Table of Terminal Escape Codes}
 
 (...)
+
+\begin{thebibliography}{99}
+    \bibitem{}
+        Unix Power Tools
+
+    \bibitem{}
+        wikipedia: backspace
+
+    \bibitem{}
+        wp:ansi
+
+    \bibitem{}
+        wp:vt100
+
+    \bibitem{}
+        EBNF
+
+    \bibitem{}
+        tree evaluation
+
+    \bibitem{}
+        statistical method
+
+    \bibitem{}
+        DSL book
+\end{thebibliography}
 
 \end{document}
