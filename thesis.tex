@@ -1,7 +1,8 @@
-\documentclass[twoside]{scrreprt}
+\documentclass[twoside,parskip]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 
 \usepackage{url}
 \usepackage{soul}
@@ -18,21 +19,29 @@
 \usepackage{listings}
 \renewmenumacro{\keys}[+]{shadowedroundedkeys}
 
-\usepackage{courier}
+%\usepackage{courier}
 \usepackage{microtype}
 \DisableLigatures[<,>]{family=tt*}
 
+\lstdefinelanguage{nutsh}{
+    morekeywords={if,else,prompt,def,break,return},
+    sensitive=false,
+morecomment=[l]{//},
+morecomment=[s]{/*}{*/},
+morestring=[b]"
+}
+
 \lstset{
+    language=nutsh,
     aboveskip=20pt,
     belowskip=20pt,
-    basicstyle=\small\ttfamily,
+    xleftmargin=\parindent,
+    basicstyle=\ttfamily,
     %numbers=left,
-    numberstyle=\tiny,
-    frame=tb,
+    %numberstyle=\tiny,
+    %frame=tb,
     columns=fullflexible,
-    showstringspaces=false,
-    literate=%
-    {~}{\url{~}}1
+    showstringspaces=false
 }
 
 \titlehead{\sffamily\bfseries\centerline{Braunschweig University of Technology}\centerline{Institute for Programming and Reactive Systems}}
@@ -46,6 +55,12 @@
 \begin{document}
 
 \maketitle
+
+\chapter*{Declaration of Authorship}
+
+I hereby declare that this thesis is my own unaided work. All sources used are acknowledged as references.
+
+Braunschweig, 2013-11-03 \dotfill
 
 \begin{abstract}
     (Purpose)
@@ -105,6 +120,23 @@ Design-wise, the framework consists of three layers:
 Implementation details follow in (ch x).
 
 To find out whether this teaching approach has benefits, the framework was applied and evaluated in an eight-day study with about xx participants, this is described in (ch x).
+
+\subsection{Notation}
+
+For specifying a grammar, we use EBNF:
+
+\begin{lstlisting}
+    Grammar     = { Production }
+    Production  = production_name "=" [ Expression ] "." .
+    Expression  = Alternative { "|" Alternative } .
+    Alternative = Term { Term } .
+    Term        = production_name | token | Group | Option | Repetition .
+    Group       = "(" Expression ")" .
+    Option      = "[" Expression "]" .
+    Repetition  = "{" Expression "}" .
+\end{lstlisting}
+
+(descr)
 
 \chapter{Preliminaries}
 
@@ -315,9 +347,57 @@ nutsh does not have variables, which makes the language functional.
 
 \section{Lexical Elements}
 
-(Token types)
+\subsection{Comments}
 
-(Diagram: State machine)
+\emph{nutsh} has two types of comments, which are common in C-like languages: \emph{Line comments} start with \texttt{//} and stop at the end of the line, \emph{block comments} start with \texttt{/*} and end with \texttt{*/}.
+
+Comments are ignored.
+
+\subsection{White space}
+
+Whites space (newlines, carriage returns, tabs and spaces) seperates tokens but has no meaning otherwise.
+
+\subsection{Identifiers}
+
+Identifiers serve as names that can be used to define and call functions. An identifier is a non-empty sequence of alphanumeric characters.
+
+\begin{lstlisting}
+Identifier = letter { letter } .
+\end{lstlisting}
+
+\subsection{Keywords}
+
+\emph{nutsh} uses the keywords \texttt{break}, \texttt{def}, \texttt{else}, \texttt{if}, \texttt{prompt}, and \texttt{return}, which may not be used as identifiers.
+
+\subsection{Operators and Delimiters}
+
+The following character sequences have special meanings: \texttt{=\~},
+\texttt{==},
+\texttt{||},
+\texttt{,}
+\texttt{!},
+\texttt{(},
+\texttt{)}
+\texttt{\{},
+\texttt{+}
+\texttt{\}}, and
+\texttt{\&\&}.
+
+\subsection{String Literals}
+
+There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}.
+
+Raw string literals are enclosed with back quotes (\texttt{`}). They mean contain any character except the back quote; the characters are interpreted literally.
+
+Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes.
+
+\begin{lstlisting}
+    string = raw_string | interpreted_string .
+    raw_string = "`" { unicode_char } "`" .
+    interpreted_string = `"` { unicode_char | byte_value } `"` .
+\end{lstlisting}
+
+((nur?) ref)
 
 \section{Syntax}
 
@@ -363,7 +443,7 @@ It has the semantic of an endless loop, where at the beginning of each pass a co
 
 There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the last user command and its output.
 
-The language has \texttt{if-alse} expressions, whose syntax is influenced by Go (no brackets around the expression):
+The language has \texttt{if-else} expressions, whose syntax is influenced by Go (no brackets around the expression):
 
 \begin{lstlisting}
 if command =~ "42" {
@@ -377,9 +457,9 @@ if command =~ "42" {
 
 To reuse code snippets, you can put them into functions:
 
-\begin{lstlisting}
+\begin{lstlisting}[mathescape]
 def exit_status {
-    return(run("echo $?"))
+    return(run("echo $\$$?"))
 }
 
 def say_twice(text) {
@@ -463,7 +543,25 @@ stay_in("/tmp"), help {
 
 \subsection{Grammar}
 
-(EBNF of language constructs)
+\begin{lstlisting}
+    Lesson = ToplevelLines .
+    ToplevelLines = { Definition | Line } .
+    Definition = "def" identifier [ Arguments ] Block .
+    Arguments = "(" [ identifier { "," identifier } ] ")" .
+    Block = "{" { Line } "}" .
+    Line = IfStatement | PromptStatement | State | Call | string .
+    IfStatement = "if" StringExpression Block ( "else" Block ) .
+    PromptStatement = "prompt" Block .
+    State = Calls Block .
+    Calls = Call { "," Call } .
+    Call = identifier [ "(" [ StringExpressions ] ")" ] .
+    StringExpressions = StringExpression { "," StringExpression } .
+    StringExpression =
+            string | Call | StringExpression Operator StringExpression |
+            "!" StringExpression | "(" StringExpression ")" .
+
+    Operator = ( "+" | "=~" | "==" | "&&" | "||" ) .
+\end{lstlisting}
 
 \section{Parsing}
 
@@ -637,11 +735,5 @@ statistical method
 \chapter{Table of Terminal Escape Codes}
 
 (...)
-
-\chapter*{Affidavit}
-
-("Erklärung an Eides statt")
-\vspace{8em}
-(german)
 
 \end{document}
