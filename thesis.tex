@@ -45,18 +45,20 @@
 \graphicspath{images/}
 % figure: tb für kleie, p für eigene Seite
 
-\titlehead{\sffamily\bfseries\centerline{Braunschweig University of Technology}\centerline{Institute for Programming and Reactive Systems}}
+\titlehead{\includegraphics[height=2cm]{TUBraunschweig_RGB.pdf} \hfill \includegraphics[height=2cm]{ips.png}}
 
 \subject{Bachelor Thesis}
-\title{The Nut Shell - A Framework for Creating Interactive Command Line Tutorials}
+\title{The Nut Shell -- A Framework for Creating Interactive Command Line Tutorials}
 \author{Sebastian Morr \texttt{<sebastian@morr.cc>}}
 \date{2013-11-03}
-\publishers{\textbf{Advisor:} Dr. Werner Struckmann}
-\uppertitleback{I hereby declare that this thesis is my own unaided work. All sources used are acknowledged as references.
+\publishers{Institute for Programming and Reactive Systems\\
+Prof. Dr. Ursula Goltz\\[\baselineskip]
+Advisor: Dr. Werner Struckmann}
+%\uppertitleback{I hereby declare that this thesis is my own unaided work. All sources used are acknowledged as references.
 
-\vspace{2cm}
+%\vspace{2cm}
 
-Braunschweig, 2013-11-03 \dotfill}
+%Braunschweig, 2013-11-03 \dotfill}
 \lowertitleback{This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The text is set using the \textsc{Latin Modern} font family.}
 \begin{document}
 
@@ -64,8 +66,8 @@ Braunschweig, 2013-11-03 \dotfill}
 \maketitle
 \restoregeometry
 
-\clearpage
-\pagenumbering{roman}
+%\clearpage
+%\pagenumbering{roman}
 
 \begin{abstract}
 
@@ -91,8 +93,8 @@ Braunschweig, 2013-11-03 \dotfill}
 \setcounter{tocdepth}{2}
 \tableofcontents
 
-\cleardoublepage
-\pagenumbering{arabic}
+%\cleardoublepage
+%\pagenumbering{arabic}
 
 \chapter{Introduction}
 
@@ -728,8 +730,8 @@ Right now, typing errors can be catched by defining some command-rules by hand. 
 
 I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it.
 
+\cleardoublepage
 \part*{Appendix}
-
 \appendix
 
 \chapter{Example Lesson}
