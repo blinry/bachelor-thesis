@@ -1,4 +1,4 @@
-\documentclass[a4paper,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib]{scrreprt}
+\documentclass[paper=a4,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -6,7 +6,18 @@
 \usepackage[ngerman,english]{babel}
 
 \usepackage{blindtext}
-\usepackage{upquote}
+\usepackage{pgfplots, pgfplotstable}
+    \pgfplotsset{compat=1.8}
+
+\usetikzlibrary{patterns}
+    \makeatletter
+    \newcommand\resetstackedplots{
+        \makeatletter
+        \pgfplots@stacked@isfirstplottrue
+        \makeatother
+        \addplot [forget plot,draw=none] coordinates{(1,0) (2,0) (3,0) (4,0) (5,0) (6,0) (7,0) (8,0) (9,0) (10,0) (11,0)};
+    }
+    \makeatother
 
 \usepackage{soul}
     \sethlcolor{darkgray}
@@ -43,11 +54,11 @@
     }
 
 \graphicspath{images/}
-% figure: tb für kleie, p für eigene Seite
+% figure: tb für kleine, p für eigene Seite
 
 \titlehead{\includegraphics[height=2cm]{TUBraunschweig_RGB.pdf} \hfill \includegraphics[height=2cm]{ips.png}}
 
-\subject{Bachelor Thesis}
+\subject{\sffamily Bachelor Thesis}
 \title{The Nut Shell -- A Framework for Creating Interactive Command Line Tutorials}
 \author{Sebastian Morr \texttt{<sebastian@morr.cc>}}
 \date{2013-11-03}
@@ -59,7 +70,20 @@ Advisor: Dr. Werner Struckmann}
 %\vspace{2cm}
 
 %Braunschweig, 2013-11-03 \dotfill}
-\lowertitleback{This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The text is set using the \textsc{Latin Modern} font family.}
+\lowertitleback{I would like to thank the following people for their support in the creation of this thesis:
+
+Hauke Baller,
+Arne Brüsch,
+Hendrik Freytag,
+Heike Laschin,
+Moritz Mühlhausen,
+Markus Reschke,
+Werner Struckmann,
+Wolfgang Morr,
+Leslie Wöhler
+\\[\baselineskip]
+This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The text is set using the \textsc{Latin Modern} font family.
+}
 \begin{document}
 
 \newgeometry{left=2cm,right=2cm}
@@ -122,7 +146,7 @@ The \emph{Nut Shell} is designed to be a wrapper around a common command line pr
 
 The goal is to be able to adapt to any command line interface -- how this abstraction is achieved is described in (ch x).
 
-The Nut Shell will be designed in such a way that the command line's output will be let through unchanged, and will only be annotated.
+The \emph{Nut Shell} will be designed in such a way that the command line's output will be let through unchanged, and will only be annotated.
 
 This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}.
 
@@ -154,21 +178,6 @@ For specifying a grammar, we use EBNF:
 \end{lstlisting}
 
 (descr)
-
-\section{Acknowledgements}
-
-I would like to thank the following people for their support in the creation of this thesis:
-
-Hauke Baller,
-Arne Brüsch,
-Hendrik Freytag,
-Heike Laschin,
-Moritz Mühlhausen,
-Markus Reschke,
-Werner Struckmann,
-Wolfgang Morr,
-Leslie Wöhler
-
 
 \chapter{Preliminaries}
 
@@ -643,15 +652,15 @@ To check that the lessons work, the tutorial's author needs a method to test the
 
 \chapter{Application and Evaluation}
 
-To find out whether the teaching method provided by the Nut Shell has any advantages compared to classical tutorials, we created an example tutorial and conducted a two-week course with subsequent survey.
+To find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to classical tutorials, we created an example tutorial and conducted a two-week course with subsequent survey.
 
 \section{Setting}
 
-The \textsc{Braunschweig University of Technology} organizes preparatory Computer Science courses for freshman students every semester since (year). This course has two parts: One is about basic theoretical concepts of algorithms, the other one is about programming and related tools. (copy from descr.) The evaluation was conducted in the context of the second part.
+The \textsc{Braunschweig University of Technology} organizes preparatory Computer Science courses for freshman students every semester since 2003. This course teaches how to use UNIX-like operating systems and accompaning tools for program creation.
 
-Before, the topics were tought by handing out exercises on paper, which could be worked on in computer pools. For suport, student assistants were provided, with one assistant per approximately 25 students.
+Until now, the topics were tought by handing out exercises on paper, which the students could work on in computer pools. For support, student assistants were provided, with approximately one assistant per 25 students.
 
-
+In the fall semester 2013-2014, 150 students enrolled in the course. For this study, the students were split into two groups: $\frac{2}{3}$ of the students (100) were randomly selected to use the Nut Shell, the remaining $\frac{1}{3}$ (50) worked with the previously used paper exercises. The groups worked in two seperate rooms. Per day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
 
 \section{Content}
 
@@ -712,9 +721,108 @@ The second part of the survey was a quiz with 11 questions about different topic
 
 \section{Results}
 
-(Pretty graphs)
+For the first part, there were 64 answers in total. 52 of those used the Nut Shell, 11 of them the exercises. Table \ref{tab:generalscores} shows the averages scores in both groups.
 
-(Statistical evaluation)
+\begin{figure}[h]
+    \caption{Average scores for the general questions}
+    \label{tab:generalscores}
+    \begin{tabular}{l|l|l}
+        Question & average score Nut Shell & average score Paper \\
+        \hline
+        Ich hatte bereits Vorwissen über die Kommandozeile.        & 3.13 & 1.75 \\
+        Der Vorkurs hat mir Spaß gemacht.                          & 8.50 & 7.75 \\
+        Ich habe im Vorkurs viel gelernt.                              & 8.46 & 7.75 \\
+        Die Aufgaben waren zu schwierig.                               & 3.98 & 4.33 \\
+        Es war genug Zeit, die Aufgaben zu bearbeiten.                 & 8.31 & 8.83 \\
+        Der Stoff erscheint mir relevant für meine weitere Ausbildung. & 7.90 & 7.58 \\
+        Ich würde den Vorkurs weiterempfehlen.                     & 8.71 & 8.67
+    \end{tabular}
+\end{figure}
+
+\begin{tikzpicture}
+    \begin{axis}[
+            ytick={1,2,3},
+            yticklabels={Group A, Group B, Group C},
+            boxplot/variable width,
+        ]
+        \addplot+[% Group A:
+            boxplot prepared={
+                lower whisker=42, lower quartile=45,
+                median=47,
+                upper quartile=47.5, upper whisker=48,
+                sample size=1000,
+            },
+        ]
+        table[row sep=\\,y index=0] { 40\\ 34\\ 56\\ };
+        \addplot+[% Group B:
+            boxplot prepared={
+                lower whisker=36, lower quartile=39,
+                median=40,
+                upper quartile=41, upper whisker=43,
+                sample size=100000,
+            },
+        ]
+        coordinates {};
+        \addplot+[% Group C:
+            boxplot prepared={
+                lower whisker=41, lower quartile=44,
+                median=45,
+                upper quartile=46, upper whisker=47,
+                sample size=50000,
+            },
+        ]
+        coordinates {(0,35) (0,55)};
+    \end{axis}
+\end{tikzpicture}
+
+Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um Hilfe fragen?  
+%1.94 & 4.33 &
+
+Figure~\ref{fig:participants} shows the number of participants per day in both groups.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[trim axis left, trim axis right]
+        \pgfplotstableread{ % Read the data into a table macro
+            Label	Slot1	Slot2	Slot3	a	b	c
+            1	29	26	25	2	4	2
+            2	25	28	24	6	3	5
+            3	30	25	16	6	12	14
+            4	24	22	16	7	10	4
+            5	25	19	11	5	10	1
+            6	0	0	0 	0	0	0
+            7	0	0	0 	0	0	0
+            8	23	28	12	7	11	2
+            9	25	23	19	9	9	1
+            10	0	0	0 	0	0	0
+            11	25	20	6 	3	8	0
+        }\datatable
+
+        \begin{axis}[
+                width=\textwidth,
+                ybar stacked,
+                ymin=0,
+                xtick=data,
+                xticklabels from table={\datatable}{Label},
+                xlabel=Day,
+                ylabel=Participants
+            ]
+            \addplot [pattern=north west lines, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};    % Plot the "First" column against the data index
+            \addplot [pattern=north west lines, bar shift=-.2cm] table [y=Slot2, x expr=\coordindex] {\datatable};
+            \addplot [pattern=north west lines, bar shift=-.2cm] table [y=Slot3, x expr=\coordindex] {\datatable};
+
+            \resetstackedplots
+
+            \addplot [pattern=north east lines, bar shift=.2cm] table [y=a, x expr=\coordindex] {\datatable};
+            \addplot [pattern=north east lines, bar shift=.2cm] table [y=b, x expr=\coordindex] {\datatable};
+            \addplot [pattern=north east lines, bar shift=.2cm] table [y=c, x expr=\coordindex] {\datatable};
+
+            \legend{Slot 1, Slot 2, Slot 3, sad, sadf, asfd}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Number of participants per day}
+    \label{fig:participants}
+\end{figure}
 
 \chapter{Conclusions}
 
@@ -767,7 +875,10 @@ The framework was implemented in Go (src), a compiled, statically typed language
 
 \begin{thebibliography}{99}
     \bibitem{}
-        Unix Power Tools
+        Jerry Peek; Tim O'Reilly; Mike Loukides et. al: \emph{Unix Power Tools}. 2nd Edition. O'Reilly \& Associates, Inc, 1997
+
+    \bibitem{}
+        dragon book
 
     \bibitem{}
         wikipedia: backspace
