@@ -1,4 +1,4 @@
-\documentclass[paper=a4,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib]{scrreprt}
+\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -55,6 +55,7 @@
     \newcommand{\cursor}{\invert{ }}
     \newcommand{\escape}[1]{\textasciicircum #1}
 \usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
 \usepackage[os=win]{menukeys}
     \renewmenumacro{\keys}[+]{shadowedroundedkeys}
 \usepackage{syntax}
@@ -112,7 +113,7 @@ Werner Struckmann,
 Wolfgang Morr,
 Leslie Wöhler
 \\[\baselineskip]
-This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The text is set using the \textsc{Latin Modern} font family.
+This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The figures are created with \texttt{pgfplots}, key combinations with \texttt{menukeys}. The text is set using the \textsc{Latin Modern} font family.
 }
 \begin{document}
 
@@ -325,11 +326,11 @@ The \textsc{CLI} can start other programs which run in the foreground, that is, 
 
 The parser solves this by using a timer: If a command runs longer than (x) milliseconds, that is, when the parser waits longer than that for a marker, it switches to \emph{interactive mode}, which shows the output directly.
 
-\section{Recognizing the Prompt}
+\section{Recognizing the prompt}
 
 The prompt is configured to start and end with a marker. This leads to problems when the user tries to reconfigure the prompt.
 
-\section{Multi Line Commands}
+\section{Multi line commands}
 
 The are \textsc{CLI}s which recognize that a command is incomplete. In this case, they do not send the command, but give the user the possibility to complete it. Usually, the CLI displays a second, special prompt in this case. The parser inserts markers there, too, so that it can be differeniated from a normal prompt.
 
@@ -416,7 +417,7 @@ The language is string-based, the only data type is a string of Unicode characte
 
 nutsh does not have variables, which makes the language functional.
 
-\section{Lexical Elements}
+\section{Lexical elements}
 
 \minisec{Comments}
 
@@ -440,7 +441,7 @@ Identifier = letter { letter } .
 
 \emph{nutsh} uses the keywords \texttt{break}, \texttt{def}, \texttt{else}, \texttt{if}, \texttt{prompt}, and \texttt{return}, which may not be used as identifiers.
 
-\subsection{Operators and Delimiters}
+\subsection{Operators and delimiters}
 
 The following character sequences have special meanings: \texttt{=\~},
 \texttt{==},
@@ -670,7 +671,7 @@ stay_in("/tmp"), help {
 
 (Function stack)
 
-\section{Automated Testing}
+\section{Automated testing}
 
 To check that the lessons work, the tutorial's author needs a method to test the correctness of the lessons automatically, so they doesn't have to enter all the commands by hand.
 
@@ -682,44 +683,45 @@ To check that the lessons work, the tutorial's author needs a method to test the
 
 \chapter{Application and Evaluation}
 
-To find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to classical tutorials, we created an example tutorial and conducted a two-week course with subsequent survey.
+In order to find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to traditional teaching methods, we created an example tutorial and conducted a two-week course with a subsequent survey.
 
 \section{Setting}
 
-The \textsc{Braunschweig University of Technology} organizes preparatory Computer Science courses for freshman students every semester since 2003. This course teaches how to use UNIX-like operating systems and accompaning tools for program creation.
+The \textit{Braunschweig University of Technology} has been organizing preparatory Computer Science courses for freshman students since 2003. This course teaches how to use UNIX-like operating systems and accompaning tools for program creation.
 
-Until now, the topics were tought by handing out exercises on paper, which the students could work on in computer pools. For support, student assistants were provided, with approximately one assistant per 25 students.
+Until now, these topics were tought by handing out exercises on paper, which the students could work on in computer pools. For support, student assistants were provided, with approximately one assistant per 25 students.
 
-In the fall semester 2013-2014, 150 students enrolled in the course. For this study, the students were split into two groups: $\frac{2}{3}$ of the students (100) were randomly selected to use the Nut Shell, the remaining $\frac{1}{3}$ (50) worked with the previously used paper exercises. The groups worked in two seperate rooms. Per day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
+In the fall semester 2013-2014, 150 students enrolled in the course. For this study, the students were split into two groups: Two thirds of the students were randomly selected to use the Nut Shell, the remaining one third worked with the previously used exercises on paper. The groups worked in two seperate rooms. Per day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
 
-\section{Content}
+\section{Previous approach}
 
-In summary, the course was about learning how to use the system shell \emph{bash} and various command line tools. This included the following topics: The UNIX file system, text editors, process management, text tools like \texttt{grep}, \texttt{sort}, or \texttt{patch}, various shell mechanism like output redirection, shell scripts, Makefiles, ssh, \LaTeX, Java, Git.
+The previous course roughly covered the following topics: The \textsc{UNIX} file system and how to manipulate it; various text editors like Vim, Emacs, and Gedit; process management; command line tools for text manupulation like \texttt{grep}, \texttt{sort}, or \texttt{patch}; various shell mechanism like output redirection and the command history; shell scripts; automatition with Makefiles; accessing remote servers with \textsc{SSH}; typesetting documents with \LaTeX; understanding and repairing programs written in \textit{Java}; and version control with \textit{Git}.
 
-The Nut Shell tutorial that we created kept these topics and their order, but presented them in a different fashion: 
+\section{New approach}
 
-For an example of such a tutorial, refer to (app x).
+The newly created \textit{Nut Shell} tutorial kept these topics and their order, but presented them in a different fashion.
 
-\subsection{Best practises in lesson writing}
+For an example of such a tutorial, refer to \cref{sec:nutshexample}.
 
-provide "echo help"
-let the user play
-let the user choose paths
-introduce metaphors
-...
+In total, the tutorial contains 2875 lines of \textit{nutsh} code. It took approximately 40 hours to write and test the lessons.
+
+\minisec{Style}
+
+The basic structure in the tutorial when introducing new concepts is the following: First, a general problem is stated. The method or tool for solving these problem instances is presented with a simple example, where the user is guided exactly what to do. After that follow several problems the user has to solve on his own of increasing difficulty. Finally, some advanced concepts and ideas are touched, and the user is given some free room to experiment with those. A clear signal is communicated the user can use to continue.
+
+Often, goals are stated but how to achieve it is up to the user. This has to be realized by testing against \texttt{output} and \texttt{run()} statements. At several occasions, the user can choose between several paths to continue or can determine in which order to learn about several topics. These structures are supposed to give the user a feeling of autonomy and control.
+
+For better illustration and for a more entertaining experience, the lessons introduce several real-world metaphors for abstract concepts. For example, in a lesson about the compression of files, the user is confronted with a directory named \textit{fridge} and a large file named \textit{elephant} and is asked to put the elephant in the fridge.\footnote{This is a reference to the old joke “How do you put an elephant into a fridge? -- Open the fridge, put in the elephant, and close the door.”} In order to complete this task, the file has to be compressed.
 
 \section{Survey}
 
-After the sixth day, an online survey was conducted whithin both groups.
-
-\subsection{General questions}
-
-The following questions were asked (in German):
+After the sixth day, an online survey was conducted whithin both groups. In the first part, the following general questions were asked (in German):
 
 \begin{itemize}
     \item What is your course of studies?
+    \item Did you use the \emph{Nut Shell} or the paper exercises?
     \item On a range from 1 (not at all) to 10 (entirely), how much do you agree to the following statements?
-        \begin{itemize}
+        \begin{enumerate}
             \item I had previous knowledge about the command line.
             \item The tutorial was fun.
             \item I learned a lot in the tutorial.
@@ -727,15 +729,13 @@ The following questions were asked (in German):
             \item I had enough time to complete the exercises.
             \item I think the material is relevant for my further education.
             \item I would recommend the tutorial to others.
-        \end{itemize}
-    \item How many times per day did you have to ask for help?
+        \end{enumerate}
+    \item How many times did you have to ask for help per day?
 \end{itemize}
 
-\subsection{Quiz}
+The second part of the survey was a quiz with 11 questions about different topics of the tutorial, in an attempt to quantify how much the participants learned. The following questions were provided by a person who was uninvolved with and unaware of the content of the \emph{Nut Shell} lessons to avoid a bias which could have led to asking questions we knew the Nut Shell explained well.
 
-The second part of the survey was a quiz with 11 questions about different topics of the tutorial, in an attempt to measure how much the participants learned. The following questions were provided by a person who was uninvolved with and unaware of the content of the Nut Shell lessons (thanks!) to avoid a bias which could have led to asking questions we knew the Nut Shell explained well.
-
-\begin{itemize}
+\begin{enumerate}
     \item How do you copy the file \texttt{abc.txt} to the directory \texttt{xyz}?
     \item How can you obtain more information about the command \texttt{mv}?
     \item Name at least two ways to look at the content of the file \texttt{abc.txt}.
@@ -746,12 +746,12 @@ The second part of the survey was a quiz with 11 questions about different topic
     \item How dou you archive and compress all files with the ending "123" in the current directory?
     \item What is the file \texttt{~/.bashrc} used for?
     \item You don't want to type \texttt{ls -alR} all the time, but create a short hand form. Which possibilities do you have and what is the corresponding command?
-    \item What are pipes used for and how do you use them. Write an example command.
-\end{itemize}
+    \item What are pipes used for and how do you use them? Write an example command.
+\end{enumerate}
 
 \section{Results}
 
-For the first part, there were 64 answers in total. 52 of those used the Nut Shell, 11 of them the exercises. Figure \ref{fig:general} shows the averages scores in both groups.
+For the first part, there were 64 answers in total. 52 of the participants specified they had used the \emph{Nut Shell}, 11 of them the exercises. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot. The circle marks the answer's median of a question, the box contains 50\% of the answers, the whiskers reach from the minimal to the maximal score.
 
 \begin{figure}[p]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -763,8 +763,8 @@ For the first part, there were 64 answers in total. 52 of those used the Nut She
                 y dir=reverse,
                 height=\textheight,
                 width=\textwidth,
-                xmin=1,
-                xmax=10,
+                xmin=0.5,
+                xmax=10.5,
                 xmajorgrids,
                 ymin=0,
                 ymax=8,
@@ -935,10 +935,60 @@ For the first part, there were 64 answers in total. 52 of those used the Nut She
     \label{fig:general}
 \end{figure}
 
+\begin{figure}[p]
+    \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{axis}[
+                boxplotcompare style,
+                ytick={1},
+                yticklabels={help/day},
+                boxplot,
+                y dir=reverse,
+                height=0.32\textwidth,
+                width=\textwidth,
+                xmin=0.5,
+                xmax=10.5,
+                xmajorgrids,
+                ymin=0.2,
+                ymax=1.5,
+            ]
+
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Paper};
+            \addlegendimage{area legend, fill=gray, draw=black}
+            \addlegendentry{Nut Shell};
+
+            \addplot[
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =0,
+                    lower quartile=1,
+                    median        =1.5,
+                    upper quartile=3,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =1,
+                    lower quartile=2,
+                    median        =4,
+                    upper quartile=5.5,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+        \end{axis}
+    \end{tikzpicture}
+    \centering
+    \caption{How many times did you have to ask for help per day?}
+    \label{fig:general}
+\end{figure}
+
 Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um Hilfe fragen?  
 %1.94 & 4.33 &
 
-Figure~\ref{fig:participants} shows the number of participants per day in both groups.
+\Cref{fig:participants} shows the number of participants per day in both groups.
 
 \begin{figure}[h]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -961,20 +1011,23 @@ Figure~\ref{fig:participants} shows the number of participants per day in both g
                 width=\textwidth,
                 ybar stacked,
                 ymin=0,
+                xmin=-1,
+                xmax=11,
                 xtick=data,
                 xticklabels from table={\datatable}{Label},
                 xlabel=Day,
-                ylabel=Participants
+                ylabel=Participants,
+                ymajorgrids,
             ]
-            \addplot [pattern=north west lines, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};    % Plot the "First" column against the data index
-            \addplot [pattern=north west lines, bar shift=-.2cm] table [y=Slot2, x expr=\coordindex] {\datatable};
-            \addplot [pattern=north west lines, bar shift=-.2cm] table [y=Slot3, x expr=\coordindex] {\datatable};
+            \addplot [fill=gray, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};    % Plot the "First" column against the data index
+            \addplot [fill=gray, bar shift=-.2cm] table [y=Slot2, x expr=\coordindex] {\datatable};
+            \addplot [fill=gray, bar shift=-.2cm] table [y=Slot3, x expr=\coordindex] {\datatable};
 
             \resetstackedplots
 
-            \addplot [pattern=north east lines, bar shift=.2cm] table [y=a, x expr=\coordindex] {\datatable};
-            \addplot [pattern=north east lines, bar shift=.2cm] table [y=b, x expr=\coordindex] {\datatable};
-            \addplot [pattern=north east lines, bar shift=.2cm] table [y=c, x expr=\coordindex] {\datatable};
+            \addplot [fill=white, bar shift=.2cm] table [y=a, x expr=\coordindex] {\datatable};
+            \addplot [fill=white, bar shift=.2cm] table [y=b, x expr=\coordindex] {\datatable};
+            \addplot [fill=white, bar shift=.2cm] table [y=c, x expr=\coordindex] {\datatable};
 
             \legend{Slot 1, Slot 2, Slot 3, sad, sadf, asfd}
         \end{axis}
@@ -983,6 +1036,10 @@ Figure~\ref{fig:participants} shows the number of participants per day in both g
     \caption{Number of participants per day}
     \label{fig:participants}
 \end{figure}
+
+\section{Discussion}
+
+(oral feedback?)
 
 \chapter{Conclusions}
 
@@ -996,6 +1053,8 @@ Right now, typing errors can be catched by defining some command-rules by hand. 
 
     (Lesson dependency tree)
 
+    (goal-oriented syntax)
+
 I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it.
 
 \cleardoublepage
@@ -1003,6 +1062,7 @@ I plan to extend the Nut Shell further and release it under an Open Source licen
 \appendix
 
 \chapter{Example Lesson}
+\label{sec:nutshexample}
 
 (nutsh source code)
 
@@ -1010,7 +1070,7 @@ I plan to extend the Nut Shell further and release it under an Open Source licen
 
 \chapter{Implementation}
 
-\section{Used Technologies}
+\section{Used technologies}
 
 The framework was implemented in Go (src), a compiled, statically typed language, which is seen by many as a modern successor to C.
 
@@ -1018,15 +1078,15 @@ The framework was implemented in Go (src), a compiled, statically typed language
 
     limesurvey
 
-\section{High-level Design}
+\section{High-level design}
 
 (Diagram: Package diagram)
 
-\section{Command Line Tool}
+\section{Command line tool}
 
 \subsection{Usage}
 
-\subsection{Builtin Functions}
+\subsection{Builtin functions}
 
 
 \chapter{Table of Terminal Escape Codes}
