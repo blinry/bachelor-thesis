@@ -8,6 +8,36 @@
 \usepackage{blindtext}
 \usepackage{pgfplots, pgfplotstable}
     \pgfplotsset{compat=1.8}
+    \usepgfplotslibrary{statistics}
+    \pgfplotsset{
+        boxplotcompare style/.style={
+            boxplot/draw direction=x,
+            % width of boxes:
+            boxplot/box extend=0.3,
+            % the median should be visualized as a circle:
+            boxplot/draw/median/.code={%
+                \draw[fill=white]
+                (boxplot cs:\pgfplotsboxplotvalue{median}) circle (3pt)
+                ;
+            },
+        },
+        rshift/.style={
+            yshift=-\pgfkeysvalueof{/pgfplots/rshift scale},
+            legend image post style={yshift=-\pgfkeysvalueof{/pgfplots/rshift scale}},
+            solid,
+            fill=gray,
+            thick,
+        },
+        lshift/.style={
+            yshift=\pgfkeysvalueof{/pgfplots/lshift scale},
+            legend image post style={yshift=\pgfkeysvalueof{/pgfplots/lshift scale}},
+            solid,
+            fill=white,
+            thick,
+        },
+        rshift scale/.initial=1.2em,
+        lshift scale/.initial=1.2em,
+    }
 
 \usetikzlibrary{patterns}
     \makeatletter
@@ -721,59 +751,189 @@ The second part of the survey was a quiz with 11 questions about different topic
 
 \section{Results}
 
-For the first part, there were 64 answers in total. 52 of those used the Nut Shell, 11 of them the exercises. Table \ref{tab:generalscores} shows the averages scores in both groups.
+For the first part, there were 64 answers in total. 52 of those used the Nut Shell, 11 of them the exercises. Figure \ref{fig:general} shows the averages scores in both groups.
 
-\begin{figure}[h]
-    \caption{Average scores for the general questions}
-    \label{tab:generalscores}
-    \begin{tabular}{l|l|l}
-        Question & average score Nut Shell & average score Paper \\
-        \hline
-        Ich hatte bereits Vorwissen über die Kommandozeile.        & 3.13 & 1.75 \\
-        Der Vorkurs hat mir Spaß gemacht.                          & 8.50 & 7.75 \\
-        Ich habe im Vorkurs viel gelernt.                              & 8.46 & 7.75 \\
-        Die Aufgaben waren zu schwierig.                               & 3.98 & 4.33 \\
-        Es war genug Zeit, die Aufgaben zu bearbeiten.                 & 8.31 & 8.83 \\
-        Der Stoff erscheint mir relevant für meine weitere Ausbildung. & 7.90 & 7.58 \\
-        Ich würde den Vorkurs weiterempfehlen.                     & 8.71 & 8.67
-    \end{tabular}
+\begin{figure}[p]
+    \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{axis}[
+                boxplotcompare style,
+                ytick={1,2,3,4,5,6,7},
+                yticklabels={Piror knowledge, Fun, Learned a lot, Too hard, Enough time, Relevant, Recommend},
+                boxplot,
+                y dir=reverse,
+                height=\textheight,
+                width=\textwidth,
+                xmin=1,
+                xmax=10,
+                xmajorgrids,
+                ymin=0,
+                ymax=8,
+            ]
+
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Paper};
+            \addlegendimage{area legend, fill=gray, draw=black}
+            \addlegendentry{Nut Shell};
+
+            \addplot[
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =1,
+                    lower quartile=1,
+                    median        =2,
+                    upper quartile=4.25,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =1,
+                    lower quartile=1,
+                    median        =1.5,
+                    upper quartile=2.25,
+                    upper whisker =3,
+                },
+            ] coordinates {};
+
+            \addplot[% fun
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =3,
+                    lower quartile=7,
+                    median        =9,
+                    upper quartile=10,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =6,
+                    lower quartile=7,
+                    median        =8,
+                    upper quartile=8,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+
+            \addplot[% learn
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =5,
+                    lower quartile=8,
+                    median        =9,
+                    upper quartile=9.25,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =5,
+                    lower quartile=7,
+                    median        =7.5,
+                    upper quartile=9,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+
+            \addplot[% too hard
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =1,
+                    lower quartile=3,
+                    median        =4,
+                    upper quartile=5,
+                    upper whisker =9,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =2,
+                    lower quartile=2.75,
+                    median        =4.5,
+                    upper quartile=5.25,
+                    upper whisker =7,
+                },
+            ] coordinates {};
+
+            \addplot[% enough time
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =3,
+                    lower quartile=7,
+                    median        =9,
+                    upper quartile=10,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =3,
+                    lower quartile=8.75,
+                    median        =10,
+                    upper quartile=10,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+
+            \addplot[% relevant
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =5,
+                    lower quartile=7,
+                    median        =8,
+                    upper quartile=9,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =5,
+                    lower quartile=6.75,
+                    median        =7.5,
+                    upper quartile=8.25,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+
+            \addplot[% recommend
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =4,
+                    lower quartile=8,
+                    median        =9,
+                    upper quartile=10,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =6,
+                    lower quartile=7.75,
+                    median        =9,
+                    upper quartile=10,
+                    upper whisker =10,
+                },
+            ] coordinates {};
+        \end{axis}
+    \end{tikzpicture}
+    \centering
+    \caption{Answers to general questions}
+    \label{fig:general}
 \end{figure}
-
-\begin{tikzpicture}
-    \begin{axis}[
-            ytick={1,2,3},
-            yticklabels={Group A, Group B, Group C},
-            boxplot/variable width,
-        ]
-        \addplot+[% Group A:
-            boxplot prepared={
-                lower whisker=42, lower quartile=45,
-                median=47,
-                upper quartile=47.5, upper whisker=48,
-                sample size=1000,
-            },
-        ]
-        table[row sep=\\,y index=0] { 40\\ 34\\ 56\\ };
-        \addplot+[% Group B:
-            boxplot prepared={
-                lower whisker=36, lower quartile=39,
-                median=40,
-                upper quartile=41, upper whisker=43,
-                sample size=100000,
-            },
-        ]
-        coordinates {};
-        \addplot+[% Group C:
-            boxplot prepared={
-                lower whisker=41, lower quartile=44,
-                median=45,
-                upper quartile=46, upper whisker=47,
-                sample size=50000,
-            },
-        ]
-        coordinates {(0,35) (0,55)};
-    \end{axis}
-\end{tikzpicture}
 
 Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um Hilfe fragen?  
 %1.94 & 4.33 &
@@ -781,7 +941,6 @@ Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um
 Figure~\ref{fig:participants} shows the number of participants per day in both groups.
 
 \begin{figure}[h]
-    \centering
     \begin{tikzpicture}[trim axis left, trim axis right]
         \pgfplotstableread{ % Read the data into a table macro
             Label	Slot1	Slot2	Slot3	a	b	c
@@ -820,6 +979,7 @@ Figure~\ref{fig:participants} shows the number of participants per day in both g
             \legend{Slot 1, Slot 2, Slot 3, sad, sadf, asfd}
         \end{axis}
     \end{tikzpicture}
+    \centering
     \caption{Number of participants per day}
     \label{fig:participants}
 \end{figure}
