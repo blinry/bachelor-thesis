@@ -14,7 +14,7 @@
             boxplot/draw direction=x,
             % width of boxes:
             boxplot/box extend=0.3,
-            % the median should be visualized as a circle:
+            % visualize the median as a circle:
             boxplot/draw/median/.code={%
                 \draw[fill=white]
                 (boxplot cs:\pgfplotsboxplotvalue{median}) circle (3pt)
@@ -110,7 +110,7 @@ Werner Struckmann,
 Wolfgang Morr,
 Leslie Wöhler
 \\[\baselineskip]
-This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The figures are created with \texttt{pgfplots}, key combinations with \texttt{menukeys}. The text is set using the \textsc{Latin Modern} font family.
+This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The figures are created with \texttt{pgfplots}, key combinations with \texttt{menukeys}. The \textsc{Latin Modern} font family.
 }
 \begin{document}
 
@@ -129,7 +129,7 @@ This document was created using \LaTeXe\ and \KOMAScript\ and edited with \texts
 
     (Design + evaluation methods)
 
-    (Major results)
+    (Main results)
 
     (Summary of conclusions)
 \end{abstract}
@@ -152,7 +152,7 @@ This document was created using \LaTeXe\ and \KOMAScript\ and edited with \texts
 
 Command line interfaces are powerful, efficient methods to interact with computers, but they often have a steep learning curve.
 
-The common way of teaching command line interfaces is a static text. This representation has several disadvantages: The users have to shift their attention forth and back between the tutorial text and the system they are learning, which could make the learning process ineffective. The text might set goals, but those aren't affirmed when they are reached. Last, when the user makes a syntactical or semantical mistake, the text does not respond to help the user fix it.
+The common way of teaching command line interfaces is a static text. This representation has several disadvantages: The users have to shift their attention forth and back between the tutorial text and the system they are learning, which could make the learning process ineffective. The text may set goals, but those aren't affirmed when they are reached. Finally, when the user makes a syntactical or semantical mistake, the text does not respond to help the user fix it.
 
 This thesis describes a system that strives to fix those problems. The core idea is to interlace the tutorial text and the command line output so that the text can respond to the state of the command line system. This approach is inspired by text adventures.
 
@@ -168,13 +168,13 @@ In the technical community, there have been several approaches in creating inter
 
 \section{Overview}
 
-The \emph{Nut Shell} is designed to be a wrapper around a common command line process.
+At the core, the \emph{Nut Shell} is a wrapper around a common command line process.
 
 (Diagram of loop?)
 
-The goal is to be able to adapt to any command line interface -- how this abstraction is achieved is described in (ch x).
+The goal is to be able to adapt to any command line interface---(ch x) describes how this abstraction is achieved.
 
-The \emph{Nut Shell} will be designed in such a way that the command line's output will be let through unchanged, and will only be annotated.
+The \emph{Nut Shell} lets through the command line's output unchanged, and will only add annotations.
 
 This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}.
 
@@ -211,17 +211,17 @@ Repetition  = "{" Expression "}" .
 
 \section{Command Line Interface}
 
-A \emph{Command Line Interface} (\textsc{CLI}) allows a user to communicate with a computer program by entering lines of text, the so-called \emph{command lines}. Although some have graphical capabilities (src), this thesis focuses on purely character-based interfaces.
+A \emph{Command Line Interface} (\textsc{CLI}) allows a user to communicate with a computer program by entering lines of text, the \emph{command lines}. Although some have graphical capabilities (src), this thesis focuses on purely character-based interfaces.
 
-Commonly, interaction with a \textsc{CLI} can be seperated into three phases:
+Commonly, interaction with a \textsc{CLI} consists of three phases:
 
 \begin{enumerate}
     \item The program writes a \emph{prompt}, which a special character sequence that signals that the program now accepts a command.
-    \item The user composes a command line, often using several editing capabilities offered by the CLI. To tell the program to execute the command, the \emph{return} character is used. (rlly?)
-    \item The program executes the command and prints a response. Sometimes, the execution is interactive (ref reaktive systeme) and does not return until the user tells the program to. After the command has finished, the first phase is entered again.
+    \item The user composes a command line, often using several editing capabilities the CLI offers. To tell the program to execute the command, he uses a \emph{return} character. (rlly?)
+    \item The program executes the command and prints a response. Sometimes, the execution is interactive (ref reaktive systeme) and does not return until the user tells the program to. After the command has finished, the first phase starts again.
 \end{enumerate}
 
-Here is an example of one iteration of these phases.\footnote{The \textsc{CLI} in this case is an \emph{Interactive Ruby Shell}.} The \texttt{>\->} is the prompt, the \texttt{2**10} is the command line entered by the user, and the \texttt{1024} is the command's output:
+Here is an example of one iteration of these phases.\footnote{The \textsc{CLI} in this case is an \emph{Interactive Ruby Shell}.} The \texttt{>\->} is the prompt, the \texttt{2**10} is the command line the user entered, and the \texttt{1024} is the command's output:
 
 \begin{lstlisting}
 >> 2**10
@@ -230,21 +230,21 @@ Here is an example of one iteration of these phases.\footnote{The \textsc{CLI} i
 
 \section{Terminal}
 
-In the past, a \emph{computer terminal} was a device that was used to communicate with mainframe computers. They read text from the user via a keyboard and displayed the computer's output, first on paper, later on a screen. (src: wiki)
+In the past, a \emph{computer terminal} was a device for communication with mainframe computers. They read text from the user via a keyboard and displayed the computer's output, first on paper, later on a screen. (src: wiki)
 
-Here, when we use the term \emph{terminal}, we mean a modern \emph{terminal emulator}, a program that resembles a terminal within an otherwise graphical environment. Inside of these terminal emulators, \textsc{CLI}s can be used.
+Here, when we use the term \emph{terminal}, we mean a modern \emph{terminal emulator}, a program that resembles a terminal within an otherwise graphical environment. Inside these terminal emulators, \textsc{CLI}s can be used.
 
 Terminals communicate through sequential streams of characters: They receive characters from a program to be displayed, and they receive characters from the user's keyboard, which they send back to the program.
 
 \subsection{Escape codes}
 
-A classical computer terminal was the \textsc{VT100}, introduced 1978 by \textsc{Digital Equipment Corporation}. Its behaviour is nowadays emulated by modern terminal emulators. The device had a mechanism for doing graphical output: By sending special character sequences, the terminal performed special actions like moving the cursor, deleting characters on the screen or turning graphical modes (underlining, different colors) on and off. The \textsc{VT100} supported the escape sequences defined in ANSI X3.64 (ref), also called the \emph{ANSI escape sequences}.
+A classical computer terminal was the \textsc{VT100}, introduced 1978 by \textsc{Digital Equipment Corporation}. Nowadays, modern terminal emulators mimic its behaviour. The device had a mechanism for doing graphical output: By sending special character sequences, the terminal performed special actions like moving the cursor, deleting characters on the screen or turning graphical modes (underlining, different colors) on and off. The \textsc{VT100} supported the escape sequences defined in ANSI X3.64 (ref), also called the \emph{ANSI escape sequences}.
 
 (...)
 
 \subsection{Readline}
 
-To allow comfortable text input, and to enable functions like command line editing or a command history, many (quot) programs use a library called \emph{readline}. This library has some default keybindings, of which we utilize the following:
+To allow comfortable text input, and to enable functions like command line editing or a command history, many (quot) programs use a library called \emph{readline}. This library has some default keybindings, of which we use the following:
 
 (come from emacs)
 
@@ -271,27 +271,27 @@ The interesting parts in this context are the following, which correspond to the
 
 \begin{enumerate}
     \item Which prompt is displayed to the user?
-    \item Which command is entered?
+    \item Which command does he enter?
     \item What is the output of this command?
 \end{enumerate}
 
-In this thesis, the target command line process is treated as a black box having both input and output streams of Unicode characters. To recognize which commands the user entered and what the corresponding output is, the framework needs to parse the output accordingly.
+In this thesis, we treat the target command line process as a black box having input and output streams of Unicode characters. To recognize which commands the user entered and what the corresponding output is, the framework needs to parse the output accordingly.
 
-For this purpose, we use two special \emph{markers}, which enable the parser to recognise the different parts. These are special character sequences that don't appear in normal output. (clarify)
+For this purpose, we use two special \emph{markers}, which enable the parser to recognize the different parts. These are special character sequences that do not appear in normal output. (clarify)
 
 \section{Recognizing the command}
 
-While the user edits the command line, they can use many of readline's key bindings or other shell builtin key combinations. These make it hard to recognize which command was entered, as parts of the entered characters could have been deleted or otherwise changed. To solve this, we use a mechanism to repeat the entered line before it is sent.
+While the user edits the command line, they can use many of readline's key bindings or other shell builtin key combinations. These make it hard to recognize which command he entered, as parts of the entered characters could have been deleted or otherwise changed. To solve this, we use a mechanism to repeat the entered line before it is sent.
 
-All targets support (by definition, through Readline) the keyboard shortcuts \keys{\ctrl+U} and \keys{\ctrl+Y}, which delete the momentarily entered command and put it in a internal buffer / re-insert it. The parser waits for the user to press Enter and then sends the sequence
+All targets support (by definition, through Readline) the keyboard shortcuts \keys{\ctrl+U} and \keys{\ctrl+Y}, which delete the momentarily entered command and put it in an internal buffer / re-insert it. The parser waits for the user to press Enter and then sends the sequence
 
 \begin{quote}
     \keys{\ctrl+U} marker \keys{\backspace} \keys{\ctrl+Y} marker \keys{\backspace} \keys{\return}
 \end{quote}
 
-to the underlying process. The result is that the entered command is appearing in the output cleanly framed by the two markers, while the output looks the same to the user.
+to the underlying process. The result is that the entered command is appearing in the output cleanly framed by the two markers, whereas the output looks the same to the user.
 
-Here is a demonstration of this technique. The first column lists the user's keystrokes, the second one contains the characters sent to the process, the third one contains the output of the process, and the last one shows the current content of the terminal.
+Here is a demonstration of this technique. The first column lists the user's keystrokes, the second one contains the characters sent to the process, the third one contains the output of the process, and the final one shows the current content of the terminal.
 
 \begin{tabular}{l|l|l|l}
     Keystrokes & Input & Output & Screen content \\
@@ -315,23 +315,23 @@ Here is a demonstration of this technique. The first column lists the user's key
     & \texttt{\escape{H}} & \texttt{\escape{H}\escape{[}[K} & \texttt{>>␣1+1\invert{ }} \\
 \end{tabular}
 
-The full output of this sequence is (...), and by taking the characters between the markers and discarding the first two (for deletion of the marker itself) and the last (the space) we get the exact command line the user wishes to send.
+The full output of this sequence is (...), and by taking the characters between the markers and discarding the first two (for deletion of the marker itself) and the final one (the space) we get the exact command line the user wishes to send.
 
 \section{Interactivity}
 
-The \textsc{CLI} can start other programs which run in the foreground, that is, wait for the user to enter text. These programs are called \emph{interactive}. Examples are text editors or pagers, that show a long text and allow the user to scroll up and down. With this kind of prompt you cannot wait for the command to finish, but you have to show the output to the user beforehand, so they can interact with it.
+The \textsc{CLI} can start other programs which run in the foreground; that is, wait for the user to enter text. These programs are called \emph{interactive}. Examples are text editors or pagers, that show a long text and allow the user to scroll up and down. With this kind of prompt you cannot wait for the command to finish, but you have to show the output to the user beforehand, so they can interact with it.
 
-The parser solves this by using a timer: If a command runs longer than (x) milliseconds, that is, when the parser waits longer than that for a marker, it switches to \emph{interactive mode}, which shows the output directly.
+The parser solves this by using a timer: If a command runs longer than (x) milliseconds; that is, when the parser waits longer than that for a marker, it switches to \emph{interactive mode}, which shows the output directly.
 
 \section{Recognizing the prompt}
 
-The prompt is configured to start and end with a marker. This leads to problems when the user tries to reconfigure the prompt.
+The \emph{Nut Shell} configures the prompt to start and end with a marker. This leads to problems when the user tries to reconfigure the prompt.
 
 \section{Multi line commands}
 
 The are \textsc{CLI}s which recognize that a command is incomplete. In this case, they do not send the command, but give the user the possibility to complete it. Usually, the CLI displays a second, special prompt in this case. The parser inserts markers there, too, so that it can be differeniated from a normal prompt.
 
-After the above enter handling, the parser looks at the next character - if it is a secondary-prompt-marker, it falls back to command-editing mode. In the end all such part-command-lines are appended to get the full command.
+After the previously described enter handling, the parser looks at the next character - if it is a secondary-prompt-marker, it falls back to command-editing mode. In the end all such part-command-lines are appended to get the full command.
 
 \section{Architecture}
 
@@ -400,9 +400,9 @@ To enable authors to create \emph{Nut Shell} tutorials quickly, we created a new
 
 Files written in the \emph{nutsh} language represent self-contained teaching unit, “lessons”.
 
-Lesson files should be as easy to read and to write as possible. We decided to use a syntax close to the ones potential users will already know, that is, regular expressions and for the rest a syntax similar to Go. C users will also feel at home. The language contain syntactic structures that support often-used semantical statements. Redundance is minimized---the language provides mechanisms to reuse code snippets.
+Lesson files should be as easy to read and to write as possible. We decided to use a syntax close to the ones potential users will already know; that is, regular expressions and for the rest a syntax similar to Go. C users will also feel at home. The language contain syntactic structures that support often-used semantical statements. The language provides mechanisms to reuse code snippets to minimize redundance.
 
-The language is string-based, the only data type is a string of Unicode characters. This was done to keep the language minimal. \emph{nutsh} does not have variables, which makes the language functional.
+The language is string-based, the only data type is a string of Unicode characters, this keeps the language minimal. \emph{nutsh} does not have variables, which makes the language functional.
 
 \section{Specification}
 
@@ -420,7 +420,7 @@ Whites space (newlines, carriage returns, tab and space characters) seperates to
 
 \minisec{Identifiers}
 
-Identifiers serve as names that can be used for functions. An identifier is a non-empty sequence of alphanumeric characters.
+Identifiers serve as names that can be used for functions. An identifier is a nonempty sequence of alphanumeric characters.
 
 \begin{ebnf}
 Identifier = letter { letter } .
@@ -471,7 +471,7 @@ interpreted_string = `"` { unicode_char | byte_value } `"` .
 
 \minisec{String Expressions}
 
-The \emph{nutsh} language is based heavily on strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, one can check whether a string matches a regular expression (\texttt{"foo" =~ "f.."}).\footnote{Using the syntax of the regular expression parsing library \emph{RE2} as described here: \url{https://code.google.com/p/re2/wiki/Syntax}} Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common logic operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or} are defined accordingly. They return the (arbitrary) nonempty string \texttt{"true"} for a truth value.
+The \emph{nutsh} language makes strong use of strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, one can check whether a string matches a regular expression (\texttt{"foo" =~ "f.."}).\footnote{Using the syntax of the regular expression parsing library \emph{RE2} as described here: \url{https://code.google.com/p/re2/wiki/Syntax}} Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common logic operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or} are defined accordingly. They return the (arbitrary) nonempty string \texttt{"true"} for a truth value.
 
 \begin{ebnf}
 StringExpression =
@@ -553,7 +553,7 @@ The prompt statement is a central element of \emph{nutsh}'s syntax. It has the s
 PromptStatement = "prompt" Block .
 \end{ebnf}
 %
-There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the user's last command and its output. When no prompt has occurred yet, they both return empty strings.
+There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the user's latest command and its output. When no prompt has occurred yet, they return empty strings.
 
 In this example, the user is asked to enter a command that has the output “42”. When he obeys, the prompt loop is left with a \texttt{break} statement, otherwise he has to try again:
 
@@ -573,7 +573,7 @@ prompt {
 
 \minisec{Function definition}
 
-To define a new function, the \texttt{def} keyword is used, followed by the name of the function, optional arguments and a block. Note that the brackets around the arguments can be omitted if a function has no arguments:
+To define a new function, the \texttt{def} keyword is used, followed by the name of the function, optional arguments and a block. The brackets around the arguments can be omitted if a function has no arguments:
 
 \begin{ebnf}
 Definition = "def" identifier [ Arguments ] Block .
@@ -634,7 +634,7 @@ respond_to_help {
 %                break
 %            }
 %        }
-%        "Okay, let's continue."
+%        "OK, let's continue."
 %    }
 %}
 %
@@ -665,7 +665,7 @@ respond_to_help {
 
 \subsection{Top level structure}
 
-A \emph{nutsh} file consists of a number of function definitions and other \texttt{Line}s (\texttt{if}-, \texttt{prompt}- and nesting statements as well as \emph{calls}, see \cref{sec:statements}). Function definitions can only appear at the top level to avoid redefinitions in different scopes, which would lead to name masking problems and more complexity.
+A \emph{nutsh} file consists of several of function definitions and other \texttt{Line}s (\texttt{if}-, \texttt{prompt}- and nesting statements in addition to \emph{calls}, see \cref{sec:statements}). Function definitions can only appear at the top level to avoid redefinitions in different scopes, which would lead to name masking problems and more complexity.
 
 \begin{ebnf}
 Lesson = { Definition | Line } .
@@ -683,9 +683,9 @@ When a function definition is encountered,
 
 \section{Automated testing}
 
-As the author of a tutorial, one wants to verify that all the lessons work correctly. This is why the framework provides a method for automated testing of correctness, so one does not have to enter all the required commands by hand.
+As the author of a tutorial, one wants to verify that all the lessons work correctly. The framework provides a function for automated testing of correctness, so one does not have to enter all the required commands by hand.
 
-To help with this, the framework provides the builtin method \texttt{expect}, which expresses the assumption of the author that if a user were to enter the supplied argument as a command in the innermost surrounding \texttt{prompt} statement, the \texttt{expect} statement would be reached.
+To help with this, the framework provides the builtin function \texttt{expect}, which expresses the assumption of the author that if a user were to enter the supplied argument as a command in the innermost surrounding \texttt{prompt} statement, the \texttt{expect} statement would be reached.
 
 In this example, the user is asked to reverse a given string. The \texttt{expect} lines give two different ways to achieve it---both should work. There's also an \texttt{expect} command that should \emph{not} lead to an evaluation of the first block:
 
@@ -714,31 +714,31 @@ By convention, when a prompt is encountered whose expects are all reached, the f
 
 \chapter{Application and Evaluation}
 
-In order to find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to traditional teaching methods, we created an example tutorial and conducted a two-week course with a subsequent survey.
+To find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to traditional teaching methods, we created an example tutorial and conducted a two-week course with a subsequent survey.
 
 \section{Setting}
 
 The \textit{Braunschweig University of Technology} has been organizing preparatory Computer Science courses for freshman students since 2003. This course teaches how to use UNIX-like operating systems and accompaning tools for program creation.
 
-Until now, these topics were tought by handing out exercises on paper, which the students could work on in computer pools. For support, student assistants were provided, with approximately one assistant per 25 students.
+Until now, these topics were tought by handing out exercises on paper, which the students could work on in computer pools. For support, student assistants were provided, with about one assistant per 25 students.
 
-In the fall semester 2013--2014, 150 students enrolled in the course. For this study, the students were split into two groups: Two thirds of the students were randomly selected to use the Nut Shell, the remaining one third worked with the previously used exercises on paper. The groups worked in two seperate rooms. Per day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
+In the fall semester 2013--2014, 150 students enrolled in the course. For this study, the students were split into two groups: Two thirds of the students were randomly selected to use the Nut Shell, the remaining one third worked with the previously used exercises on paper. The groups worked in two separate rooms. Each day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
 
-The course roughly covers the following topics: The \textsc{UNIX} file system and how to manipulate it; various text editors like Vim, Emacs, and Gedit; process management; command line tools for text manupulation like \texttt{grep}, \texttt{sort}, or \texttt{patch}; various shell mechanism like output redirection and the command history; shell scripts; automatition with Makefiles; accessing remote servers with \textsc{SSH}; typesetting documents with \LaTeX; understanding and repairing programs written in \textit{Java}; and version control with \textit{Git}.
+The course roughly covers the these topics: The \textsc{UNIX} file system and how to manipulate it; various text editors like Vim, Emacs, and Gedit; process management; command line tools for text manupulation like \texttt{grep}, \texttt{sort}, or \texttt{patch}; various shell mechanism like output redirection and the command history; shell scripts; automatition with Makefiles; accessing remote servers with \textsc{SSH}; typesetting documents with \LaTeX; understanding and repairing programs written in \textit{Java}; and version control with \textit{Git}.
 
 The newly created \textit{Nut Shell} tutorial kept these topics and their order, but presented them in a different fashion.
 
 For an example of such a tutorial, refer to \cref{sec:nutshexample}.
 
-The material was divided into 30 invidiual lessons that covered one topic, respectively. In total, the tutorial contains 2875 lines of \textit{nutsh} code. In total, it took approximately 40 hours to write and test the lessons.
+The material was divided into 30 invidiual lessons that covered one topic, respectively. In total, the tutorial contains 2875 lines of \textit{nutsh} code. In total, it took about 40 hours to write and test the lessons.
 
 \section{Style}
 
 The basic structure in the tutorial when introducing new concepts is the following: First, a general problem is stated. The method or tool for solving these problem instances is presented with a simple example, where the user is guided exactly what to do. After that follow several problems the user has to solve on his own of increasing difficulty. Finally, some advanced concepts and ideas are touched, and the user is given some free room to experiment with those. A clear signal is communicated the user can use to continue.
 
-Often, goals are stated but how to achieve it is up to the user. This has to be realized by testing against \texttt{output} and \texttt{run()} statements. At several occasions, the user can choose between several paths to continue or can determine in which order to learn about several topics. These structures are supposed to give the user a feeling of autonomy and control.
+Often, goals are stated but how to achieve it is up to the user. This has to be realized by testing against \texttt{output} and \texttt{run()} statements. At several occasions, the user can choose among several paths to continue or can determine in which order to learn about several topics. These structures are supposed to give the user a feeling of autonomy and control.
 
-For better illustration and for a more entertaining experience, the lessons introduce several real-world metaphors for abstract concepts. For example, in a lesson about the compression of files, the user is confronted with a directory named \textit{fridge} and a large file named \textit{elephant} and is asked to put the elephant in the fridge.\footnote{This is a reference to the old joke “How do you put an elephant into a fridge? -- Open the fridge, put in the elephant, and close the door.”} In order to complete this task, the file has to be compressed.
+For better illustration and for a more entertaining experience, the lessons introduce several real-world metaphors for abstract concepts. For example, in a lesson about the compression of files, the user is confronted with a directory named \textit{fridge} and a large file named \textit{elephant} and is asked to put the elephant in the fridge.\footnote{This is a reference to the old joke “How do you put an elephant into a fridge? -- Open the fridge, put in the elephant, and close the door.”} To complete this task, the file has to be compressed.
 
 \section{Survey}
 
