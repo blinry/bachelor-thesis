@@ -22,14 +22,14 @@
             },
         },
         rshift/.style={
-            yshift=-\pgfkeysvalueof{/pgfplots/rshift scale},
+            yshift=+\pgfkeysvalueof{/pgfplots/rshift scale},
             legend image post style={yshift=-\pgfkeysvalueof{/pgfplots/rshift scale}},
             solid,
             fill=gray,
             thick,
         },
         lshift/.style={
-            yshift=\pgfkeysvalueof{/pgfplots/lshift scale},
+            yshift=-\pgfkeysvalueof{/pgfplots/lshift scale},
             legend image post style={yshift=\pgfkeysvalueof{/pgfplots/lshift scale}},
             solid,
             fill=white,
@@ -72,20 +72,17 @@
     morestring=[b]"
     }
     \lstset{
-        language=nutsh,
-        aboveskip=20pt,
-        belowskip=20pt,
-        xleftmargin=\parindent,
+        aboveskip=10pt,
+        belowskip=10pt,
         basicstyle=\ttfamily,
-        %numbers=left,
-        %numberstyle=\tiny,
-        frame=tbrl,
         columns=fullflexible,
-        showstringspaces=false
+        showstringspaces=false,
+        literate={`}{\`}1,
     }
+    \lstnewenvironment{ebnf}{\lstset{language=,frame=tbrl}}{}
+    \lstnewenvironment{nutsh}{\lstset{language=nutsh,xleftmargin=\parindent}}{}
 
 \graphicspath{images/}
-% figure: tb für kleine, p für eigene Seite
 
 \titlehead{\includegraphics[height=2cm]{TUBraunschweig_RGB.pdf} \hfill \includegraphics[height=2cm]{ips.png}}
 
@@ -194,21 +191,21 @@ Implementation details follow in (ch x).
 To find out whether this teaching approach has benefits, the framework was applied and evaluated in an eight-day study with about xx participants, this is described in (ch x).
 
 \section{Notation}
+\label{sec:ebnf}
 
-For specifying a grammar, we use EBNF:
+For specifying grammars, we use EBNF (ref). Here is the EBNF flavour as used in (ref), described in itself.
+As a convention, we use use capitalized names for nonterminal symbols and lowercase names for terminal symbols.
 
-\begin{lstlisting}
-    Grammar     = { Production }
-    Production  = production_name "=" [ Expression ] "." .
-    Expression  = Alternative { "|" Alternative } .
-    Alternative = Term { Term } .
-    Term        = production_name | token | Group | Option | Repetition .
-    Group       = "(" Expression ")" .
-    Option      = "[" Expression "]" .
-    Repetition  = "{" Expression "}" .
-\end{lstlisting}
-
-(descr)
+\begin{ebnf}
+Grammar     = { Production }
+Production  = production_name "=" [ Expression ] "." .
+Expression  = Alternative { "|" Alternative } .
+Alternative = Term { Term } .
+Term        = production_name | token | Group | Option | Repetition .
+Group       = "(" Expression ")" .
+Option      = "[" Expression "]" .
+Repetition  = "{" Expression "}" .
+\end{ebnf}
 
 \chapter{Preliminaries}
 
@@ -251,7 +248,7 @@ To allow comfortable text input, and to enable functions like command line editi
 
 (come from emacs)
 
-\begin{figure}
+\begin{figure}[tb]
     \begin{tabular}{r|r}
         Key combination & effect \\
         \hline
@@ -397,275 +394,288 @@ Finally, the command output simply consists of non marker characters:
 
 (example)
 
-\chapter{The nutsh Language}
+\chapter{The \emph{nutsh} Language}
 
-The \emph{nutsh} language is designed to describe a self-contained teaching unit, a "lesson".
+To enable authors to create \emph{Nut Shell} tutorials quickly, we created a new domain-specific programming language (\textsc{DSL}). The term \emph{nutsh} is a contraction of “Nut Shell” and also serves as the filename extension.
 
-\section{Design Goals}
+Files written in the \emph{nutsh} language represent self-contained teaching unit, “lessons”.
 
-Lesson files should be as easy to read and to write as possible.
+Lesson files should be as easy to read and to write as possible. We decided to use a syntax close to the ones potential users will already know, that is, regular expressions and for the rest a syntax similar to Go. C users will also feel at home. The language contain syntactic structures that support often-used semantical statements. Redundance is minimized---the language provides mechanisms to reuse code snippets.
 
-The author decided to use a syntax close to the ones potential users will already know, that is, regular expressions and for the rest a syntax similar to Go. C users will also feel at home.
+The language is string-based, the only data type is a string of Unicode characters. This was done to keep the language minimal. \emph{nutsh} does not have variables, which makes the language functional.
 
-The language contain syntactic structures that support often-used semantical statements.
+\section{Specification}
 
-Redundance should be minimized -- the language should contain possibilities to reuse code snippets to avoid repeating them.
+In this section, the language's lexical and syntactical elements are specified in \textsc{EBNF} as defined in \cref{sec:ebnf}. Overall, \emph{nutsh}'s syntax is inspired by Google's Go (ref), for example the definition of string literals and the syntax of \texttt{if} clauses.
 
-\section{Properties}
-
-The language is string-based, the only data type is a string of Unicode characters. This was done to keep the language minimal.
-
-nutsh does not have variables, which makes the language functional.
-
-\section{Lexical elements}
+\subsection{Lexical elements}
 
 \minisec{Comments}
 
-\emph{nutsh} has two types of comments, which are common in C-like languages: \emph{Line comments} start with \texttt{//} and stop at the end of the line, \emph{block comments} start with \texttt{/*} and end with \texttt{*/}.
-
-Comments are ignored.
+\emph{nutsh} has two types of comments, as they exist in C-like languages: \emph{Line comments} start with \texttt{//} and stop at the end of the line, \emph{block comments} start with \texttt{/*} and end with \texttt{*/}. Comments act as white space and are ignored otherwise.
 
 \minisec{White space}
 
-Whites space (newlines, carriage returns, tabs and spaces) seperates tokens but has no meaning otherwise.
+Whites space (newlines, carriage returns, tab and space characters) seperates tokens but has no further meaning.
 
 \minisec{Identifiers}
 
-Identifiers serve as names that can be used to define and call functions. An identifier is a non-empty sequence of alphanumeric characters.
+Identifiers serve as names that can be used for functions. An identifier is a non-empty sequence of alphanumeric characters.
 
-\begin{lstlisting}
+\begin{ebnf}
 Identifier = letter { letter } .
-\end{lstlisting}
+\end{ebnf}
 
 \minisec{Keywords}
 
-\emph{nutsh} uses the keywords \texttt{break}, \texttt{def}, \texttt{else}, \texttt{if}, \texttt{prompt}, and \texttt{return}, which may not be used as identifiers.
+\emph{nutsh} uses the following keywords, which may not be used as identifiers:
 
-\subsection{Operators and delimiters}
+\begin{quote}
+    \texttt{break}\hspace{0.5em}
+    \texttt{def}\hspace{0.5em}
+    \texttt{else}\hspace{0.5em}
+    \texttt{if}\hspace{0.5em}
+    \texttt{prompt}\hspace{0.5em}
+    \texttt{return}
+\end{quote}
 
-The following character sequences have special meanings: \texttt{=\~},
-\texttt{==},
-\texttt{||},
-\texttt{,}
-\texttt{!},
-\texttt{(},
-\texttt{)}
-\texttt{\{},
-\texttt{+}
-\texttt{\}}, and
-\texttt{\&\&}.
+\minisec{Operators and delimiters}
+
+The following character sequences have special meanings in \emph{nutsh}:
+
+\begin{quote}
+    \texttt{=\~}\hspace{1em}
+    \texttt{==}\hspace{1em}
+    \texttt{||}\hspace{1em}
+    \texttt{,}\hspace{1em}
+    \texttt{!}\hspace{1em}
+    \texttt{(}\hspace{1em}
+    \texttt{)}\hspace{1em}
+    \texttt{\{}\hspace{1em}
+    \texttt{+}\hspace{1em}
+    \texttt{\}}\hspace{1em}
+    \texttt{\&\&}
+\end{quote}
 
 \minisec{String Literals}
 
-There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}. Raw string literals are enclosed with back quotes (\texttt{\`}). They mean contain any character except the back quote; the characters are interpreted literally. Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes.
+There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}. Raw string literals are enclosed with back quotes (\texttt{\`}). They may contain any character except the back quote; the characters are interpreted literally. Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes.
 
-\begin{lstlisting}
-    string = raw_string | interpreted_string .
-    raw_string = "`" { unicode_char } "`" .
-    interpreted_string = `"` { unicode_char | byte_value } `"` .
-\end{lstlisting}
+\begin{ebnf}
+string = raw_string | interpreted_string .
+raw_string = "`" { unicode_char } "`" .
+interpreted_string = `"` { unicode_char | byte_value } `"` .
+\end{ebnf}
 
-((nur?) ref)
+\subsection{Expressions}
 
-\section{Statements}
+\minisec{String Expressions}
 
-\minisec{If Statements}
+The \emph{nutsh} language is based heavily on strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, one can check whether a string matches a regular expression (\texttt{"foo" =~ "f.."}).\footnote{Using the syntax of the regular expression parsing library \emph{RE2} as described here: \url{https://code.google.com/p/re2/wiki/Syntax}} Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common logic operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or} are defined accordingly. They return the (arbitrary) nonempty string \texttt{"true"} for a truth value.
 
-The syntax of \emph{nutsh}'s is inspired by Go's -- there are no brackets around the condition.
+\begin{ebnf}
+StringExpression =
+        string | Call | StringExpression Operator StringExpression |
+        "!" StringExpression | "(" StringExpression ")" .
 
-\begin{lstlisting}
-    IfStatement = "if" StringExpression Block ( "else" Block ) .
-\end{lstlisting}
+Operator = "+" | "==" | "=~" | "&&" | "||" .
+\end{ebnf}
 
-In the following example, ...
+\minisec{Operator precedence}
 
-\begin{lstlisting}
+String concatenation binds strongest, followed by the two comparison operators, logical \emph{and}, and finally logical \emph{or}. Operators bind from left to right---\texttt{a OP b OP c} has the same meaning as \texttt{(a OP b) OP c}.
+
+\minisec{Calls}
+
+\emph{nutsh} knows \emph{functions}, which can be called by specifying the correct number of arguments. If a function takes no arguments, the brackets can be omitted. As a special case, a string on its own also acts as a function call, see the following section.
+
+\begin{ebnf}
+Call = identifier [ "(" [ StringExpressions ] ")" ] |
+        string .
+StringExpressions = StringExpression { "," StringExpression } .
+\end{ebnf}
+
+\subsection{Built-in functions}
+
+A central command is the output of explanation text. This text will be displayed indented and highlighted in a different color.
+
+\begin{nutsh}
+say("This is explaining text.")
+\end{nutsh}
+%
+Because this command is used so often, it can be abbreviated to:
+
+\begin{nutsh}
+"This is the short form."
+\end{nutsh}
+%
+To execute a command in the target process, you use \texttt{run()}. The value of this statement is the command's output.
+
+\begin{nutsh}
+run("1+1")
+\end{nutsh}
+
+\subsection{Statements}
+\label{sec:statements}
+
+\minisec{Blocks}
+
+A \emph{block} is a sequence of lines:
+
+\begin{ebnf}
+Block = "{" { Line } "}" .
+Line = IfStatement | PromptStatement | State | Call .
+\end{ebnf}
+
+\minisec{If statements}
+
+If the conditional expression of an \texttt{if} statement evaluates to \emph{true}, the first block is evaluated, otherwise the (optional) second block. Like in Go, there are no brackets around the condition.
+
+\begin{ebnf}
+IfStatement = "if" StringExpression Block ( "else" Block ) .
+\end{ebnf}
+%
+This example checks a string for equality with itself and prints an according message:
+
+\begin{nutsh}
 if "test" == "test" {
     "Everything is OK."
 } else {
     "Wait, what?"
 }
-\end{lstlisting}
+\end{nutsh}
 
-\minisec{Prompt Statements}
+\minisec{Prompt statements}
 
-The prompt statement is a central piece of \emph{nutsh}'s syntax. It has the semantic of an endless loop, where a command is read from the user at the beginning of each pass. It can be left with a \texttt{break} statement.
+The prompt statement is a central element of \emph{nutsh}'s syntax. It has the semantic of an endless loop, in which a command is read from the user at the beginning of each pass. It can be left with a \texttt{break} statement.
 
-\begin{lstlisting}
-    PromptStatement = "prompt" Block .
-\end{lstlisting}
+\begin{ebnf}
+PromptStatement = "prompt" Block .
+\end{ebnf}
+%
+There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the user's last command and its output. When no prompt has occurred yet, they both return empty strings.
 
-There are two builtin functions called \texttt{command} and \texttt{output}, that correspond to the last user command and its output. When no prompt has been entered yet, they return empty strings.
+In this example, the user is asked to enter a command that has the output “42”. When he obeys, the prompt loop is left with a \texttt{break} statement, otherwise he has to try again:
 
-In this example, the user is asked to enter an command that has the output "42". When he does that, the prompt loop is left, otherwise they has to try again:
+\begin{nutsh}
+"Please calculate the product of 6 and 7."
 
-\begin{lstlisting}
-    "Please calculate the product of 6 and 7."
-
-    prompt {
-        if output == "42" {
-            break
-        } else {
-            "Please try again."
-        }
+prompt {
+    if output == "42" {
+        break
+    } else {
+        "Please try again."
     }
-\end{lstlisting}
+}
 
-\minisec{State Statements}
+"Well done!"
+\end{nutsh}
 
-If you want to check the same condition for a group of prompt statements, you can use this syntax:
+\minisec{Function definition}
 
-\begin{lstlisting}
-    State = Calls Block .
-    Calls = Call { "," Call } .
-\end{lstlisting}
+To define a new function, the \texttt{def} keyword is used, followed by the name of the function, optional arguments and a block. Note that the brackets around the arguments can be omitted if a function has no arguments:
 
-Example:
+\begin{ebnf}
+Definition = "def" identifier [ Arguments ] Block .
+Arguments = "(" [ identifier { "," identifier } ] ")" .
+\end{ebnf}
+%
+As an example, we define a function that prints its argument twice:
 
-\begin{lstlisting}
-def help {
+\begin{nutsh}
+def say_twice(text) {
+    say(text)
+    say(text)
+}
+
+say_twice("Hey!")
+\end{nutsh}
+
+\minisec{Nesting statements}
+
+Sometimes, the same set of conditions needs to be checked for a group of prompt statements. In this case, nesting statements can be used. They consist of one or more function calls, followed by a block.
+
+(ref: uml)
+
+\begin{ebnf}
+State = Calls Block .
+Calls = Call { "," Call } .
+\end{ebnf}
+%
+At each pass of a prompt loop, after the command has been read from the user, the specified parent functions are called. There can be more than one level of nesting -- the outmost parent functions are called first.
+
+In this example, a function is defined that prints a message when the user enters a command that contains “help”. For two \texttt{prompt} statements, a nesting statement is defined to call this function. Now every time the user enters a command in these two prompt loops, the function is called.
+
+\begin{nutsh}
+def respond_to_help {
     if command =~ "help" {
-        "Don't panic!"
+        "Sorry, you're on your own."
     }
 }
 
-help {
+respond_to_help {
     prompt {
-        if command =~ "panic" {
-            break
-        }
+        // break condition ...
     }
-
-    "Zweite Chance..."
     prompt {
-        if command =~ "panic" {
-            break
-        }
+        // break condition ...
     }
 }
-\end{lstlisting}
+\end{nutsh}
+%
+(larger example?)
 
-At the beginning of each prompt loop, the function \texttt{help} is executed once. This works with multiple functions as well, which can be specified as a comma seperated list:
-
-\begin{lstlisting}
-def stay_in(dir) {
-    if ! run("pwd") =~ "^"+dir {
-        say("Please come back to `"+dir+"`!")
-        prompt {
-            if run("pwd") =~ "^"+dir {
-                break
-            }
-        }
-        "Okay, let's continue."
-    }
-}
-
-def help {
-    if command =~ "help" {
-        "Don't panic!"
-    }
-}
-
-run("cd /tmp")
-
-stay_in("/tmp"), help {
-    "How late is it?"
-    prompt {
-        if command == "date" {
-            break
-        }
-    }
-
-    "And who are you?"
-    prompt {
-        if command == "whoami" {
-            break
-        }
-    }
-}
-\end{lstlisting}
-
-%\subsection{Basics}
-%
-%The nutsh language is based heavily on Strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, you can check whether a string matches a regular expression (\texttt{"foo" =~ "f.."}) (flavor). Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common logic operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or} are defined accordingly. They return the arbitrary String \texttt{"true"} for a truth value.
-%
-%There are the control flow structures \emph{if-else} as well as \emph{prompt}, and you can define and call function. Variables are not neccessary, as you can define them in the target language.
-%
-%There are typical C-comments (\texttt{//} for line comments, \texttt{/* ... */} for block comments).
-%
-%\subsection{Basic Commands}
-%
-%A central command is the output of explanation text. This text will be displayed indented and highlighted in a different color.
-%
-%\begin{lstlisting}
-%say("This is explaining text.")
-%\end{lstlisting}
-%
-%Because this command is used so often, it can be abbreviated to:
-%
-%\begin{lstlisting}
-%"This is the short form."
-%\end{lstlisting}
-%
-%To execute a command in the target process, you use \texttt{run()}. Value of this statement is the command's output.
-%
-%\begin{lstlisting}
-%run("1+1")
-%\end{lstlisting}
-%
-%\subsection{Control Flow}
-%
-%\subsection{Functions}
-%
-%To reuse code snippets, you can put them into functions:
-%
-%\begin{lstlisting}[mathescape]
-%def exit_status {
-%    return(run("echo $\$$?"))
+%\begin{nutsh}
+%def stay_in(dir) {
+%    if ! run("pwd") =~ "^"+dir {
+%        say("Please come back to `"+dir+"`!")
+%        prompt {
+%            if run("pwd") =~ "^"+dir {
+%                break
+%            }
+%        }
+%        "Okay, let's continue."
+%    }
 %}
 %
-%def say_twice(text) {
-%    say(text)
-%    say(text)
+%def help {
+%    if command =~ "help" {
+%        "Don't panic!"
+%    }
 %}
 %
-%prompt {
-%    say_twice("The exit status was '"+exit_status+"'")
+%run("cd /tmp")
+%
+%stay_in("/tmp"), help {
+%    "How late is it?"
+%    prompt {
+%        if command == "date" {
+%            break
+%        }
+%    }
+%
+%    "And who are you?"
+%    prompt {
+%        if command == "whoami" {
+%            break
+%        }
+%    }
 %}
-%\end{lstlisting}
-%
-%Functions without arguments can be called without brackets as well.
-%
-%\subsection{Umgebende Zustände}
-%
+%\end{nutsh}
 
-\subsection{Grammar}
+\subsection{Top level structure}
 
-\begin{lstlisting}
-    Lesson = ToplevelLines .
-    ToplevelLines = { Definition | Line } .
-    Definition = "def" identifier [ Arguments ] Block .
-    Arguments = "(" [ identifier { "," identifier } ] ")" .
-    Block = "{" { Line } "}" .
-    Line = IfStatement | PromptStatement | State | Call | string .
-    Call = identifier [ "(" [ StringExpressions ] ")" ] .
-    StringExpressions = StringExpression { "," StringExpression } .
-    StringExpression =
-            string | Call | StringExpression Operator StringExpression |
-            "!" StringExpression | "(" StringExpression ")" .
+A \emph{nutsh} file consists of a number of function definitions and other \texttt{Line}s (\texttt{if}-, \texttt{prompt}- and nesting statements as well as \emph{calls}, see \cref{sec:statements}). Function definitions can only appear at the top level to avoid redefinitions in different scopes, which would lead to name masking problems and more complexity.
 
-    Operator = ( "+" | "=~" | "==" | "&&" | "||" ) .
-\end{lstlisting}
+\begin{ebnf}
+Lesson = { Definition | Line } .
+\end{ebnf}
 
-\section{Parsing}
+\section{Interpreting}
 
-(How YACC works)
+After parsing, we have a \emph{syntax tree} representation of the lesson. The interpreter can now travel through the tree and do its thing!
 
-\section{Semantics}
-
-(Specification of language constructs)
-
-\section{Interpreter}
+When a function definition is encountered, 
 
 (State)
 
@@ -673,13 +683,34 @@ stay_in("/tmp"), help {
 
 \section{Automated testing}
 
-To check that the lessons work, the tutorial's author needs a method to test the correctness of the lessons automatically, so they doesn't have to enter all the commands by hand.
+As the author of a tutorial, one wants to verify that all the lessons work correctly. This is why the framework provides a method for automated testing of correctness, so one does not have to enter all the required commands by hand.
+
+To help with this, the framework provides the builtin method \texttt{expect}, which expresses the assumption of the author that if a user were to enter the supplied argument as a command in the innermost surrounding \texttt{prompt} statement, the \texttt{expect} statement would be reached.
+
+In this example, the user is asked to reverse a given string. The \texttt{expect} lines give two different ways to achieve it---both should work. There's also an \texttt{expect} command that should \emph{not} lead to an evaluation of the first block:
+
+\begin{nutsh}
+run("text = 'stressed'")
+"Reverse the content of `text` and save it in `text2`!"
+prompt {
+    if test("text2 == 'desserts'") {
+        "You did it!"
+        expect("text2 = text.reverse")
+        expect("text.reverse!; text2 = text")
+        break
+    } else {
+        expect("text2 = 'somethingdifferent'")
+    }
+}
+\end{nutsh}
+
+The testing algorithm first collects all \texttt{expect} statements and creates a reference for each of them in the nearest \texttt{prompt} statement around the statement.
+
+It then starts interpreting the file like normally, but when a \texttt{prompt} statement is encountered, instead of querying the user for a command, one of the unreached associated \texttt{expect} commands is used. When the respective \texttt{expect} statement is reached, the statement is marked as \emph{reached}. When the end of the prompt loop is reached, and the \texttt{expect} has not been reached, an error is printed and the test is aborted. At the end of the file, if there are any unreached \texttt{expect}s left, the lesson is restarted.
+
+By convention, when a prompt is encountered whose expects are all reached, the first one is used. Thus, the first expect in each prompt should be one that leads to a \texttt{break} statement to ensure the testing algorithm terminates.
 
 (c0/c1)...
-
-(Testing algorithm)
-
-\section{Examples}
 
 \chapter{Application and Evaluation}
 
@@ -691,21 +722,17 @@ The \textit{Braunschweig University of Technology} has been organizing preparato
 
 Until now, these topics were tought by handing out exercises on paper, which the students could work on in computer pools. For support, student assistants were provided, with approximately one assistant per 25 students.
 
-In the fall semester 2013-2014, 150 students enrolled in the course. For this study, the students were split into two groups: Two thirds of the students were randomly selected to use the Nut Shell, the remaining one third worked with the previously used exercises on paper. The groups worked in two seperate rooms. Per day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
+In the fall semester 2013--2014, 150 students enrolled in the course. For this study, the students were split into two groups: Two thirds of the students were randomly selected to use the Nut Shell, the remaining one third worked with the previously used exercises on paper. The groups worked in two seperate rooms. Per day, there were three time slots of 75 minutes each, to which the students were assigned in equal parts. The course spanned over eight days, not including a weekend and a day off.
 
-\section{Previous approach}
-
-The previous course roughly covered the following topics: The \textsc{UNIX} file system and how to manipulate it; various text editors like Vim, Emacs, and Gedit; process management; command line tools for text manupulation like \texttt{grep}, \texttt{sort}, or \texttt{patch}; various shell mechanism like output redirection and the command history; shell scripts; automatition with Makefiles; accessing remote servers with \textsc{SSH}; typesetting documents with \LaTeX; understanding and repairing programs written in \textit{Java}; and version control with \textit{Git}.
-
-\section{New approach}
+The course roughly covers the following topics: The \textsc{UNIX} file system and how to manipulate it; various text editors like Vim, Emacs, and Gedit; process management; command line tools for text manupulation like \texttt{grep}, \texttt{sort}, or \texttt{patch}; various shell mechanism like output redirection and the command history; shell scripts; automatition with Makefiles; accessing remote servers with \textsc{SSH}; typesetting documents with \LaTeX; understanding and repairing programs written in \textit{Java}; and version control with \textit{Git}.
 
 The newly created \textit{Nut Shell} tutorial kept these topics and their order, but presented them in a different fashion.
 
 For an example of such a tutorial, refer to \cref{sec:nutshexample}.
 
-In total, the tutorial contains 2875 lines of \textit{nutsh} code. It took approximately 40 hours to write and test the lessons.
+The material was divided into 30 invidiual lessons that covered one topic, respectively. In total, the tutorial contains 2875 lines of \textit{nutsh} code. In total, it took approximately 40 hours to write and test the lessons.
 
-\minisec{Style}
+\section{Style}
 
 The basic structure in the tutorial when introducing new concepts is the following: First, a general problem is stated. The method or tool for solving these problem instances is presented with a simple example, where the user is guided exactly what to do. After that follow several problems the user has to solve on his own of increasing difficulty. Finally, some advanced concepts and ideas are touched, and the user is given some free room to experiment with those. A clear signal is communicated the user can use to continue.
 
@@ -733,9 +760,10 @@ After the sixth day, an online survey was conducted whithin both groups. In the 
     \item How many times did you have to ask for help per day?
 \end{itemize}
 
-The second part of the survey was a quiz with 11 questions about different topics of the tutorial, in an attempt to quantify how much the participants learned. The following questions were provided by a person who was uninvolved with and unaware of the content of the \emph{Nut Shell} lessons to avoid a bias which could have led to asking questions we knew the Nut Shell explained well.
+The second part of the survey was a quiz with 11 questions about different topics of the tutorial, in an attempt to quantify how much the participants learned. The following questions were provided by a person who was uninvolved with and unaware of the content of the \emph{Nut Shell} lessons to avoid a bias which could have led to asking questions we knew the Nut Shell explained well. For evaluation, each answer was marked with either 0 points (no or wrong answer), 0.5 points (correct parts), or 1 points (complete and correct answer).
 
 \begin{enumerate}
+    \item How do you create the directory \texttt{abc.txt}?
     \item How do you copy the file \texttt{abc.txt} to the directory \texttt{xyz}?
     \item How can you obtain more information about the command \texttt{mv}?
     \item Name at least two ways to look at the content of the file \texttt{abc.txt}.
@@ -751,7 +779,7 @@ The second part of the survey was a quiz with 11 questions about different topic
 
 \section{Results}
 
-For the first part, there were 64 answers in total. 52 of the participants specified they had used the \emph{Nut Shell}, 11 of them the exercises. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot. The circle marks the answer's median of a question, the box contains 50\% of the answers, the whiskers reach from the minimal to the maximal score.
+For the first part, there were 64 answers in total. 52 of the participants specified they had used the \emph{Nut Shell}, 11 of them the exercises. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot. The circle marks the answer's median of a question, the box contains 50\% of the answers, the whiskers reach from the minimal to the maximal score. According to the participants, the \emph{Nut Shell} users had significantly more fun and had the impression of having learned more than the paper exersice users. While there is slight evidence that the \emph{Nut Shell} users found the course easier, had less time, and thought of the topics more relevant, these differences are not statistically relevant.
 
 \begin{figure}[p]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -935,7 +963,9 @@ For the first part, there were 64 answers in total. 52 of the participants speci
     \label{fig:general}
 \end{figure}
 
-\begin{figure}[p]
+\Cref{fig:help} shows the answer to the question regarding how many times per day the participant needed support from a student assistant. Clearly, the \emph{Nut Shell} users needed less help.
+
+\begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
         \begin{axis}[
                 boxplotcompare style,
@@ -945,7 +975,7 @@ For the first part, there were 64 answers in total. 52 of the participants speci
                 y dir=reverse,
                 height=0.32\textwidth,
                 width=\textwidth,
-                xmin=0.5,
+                xmin=-0.5,
                 xmax=10.5,
                 xmajorgrids,
                 ymin=0.2,
@@ -982,29 +1012,78 @@ For the first part, there were 64 answers in total. 52 of the participants speci
     \end{tikzpicture}
     \centering
     \caption{How many times did you have to ask for help per day?}
-    \label{fig:general}
+    \label{fig:help}
 \end{figure}
 
-Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um Hilfe fragen?  
-%1.94 & 4.33 &
+\Cref{fig:quiz} shows the quiz scores. The assignment users achieved a slightly higher score.
+
+\begin{figure}[tb]
+    \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{axis}[
+                boxplotcompare style,
+                ytick={1},
+                yticklabels={help/day},
+                boxplot,
+                y dir=reverse,
+                height=0.32\textwidth,
+                width=\textwidth,
+                xmin=-0.5,
+                xmax=10.5,
+                xmajorgrids,
+                ymin=0.2,
+                ymax=1.5,
+            ]
+
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Paper};
+            \addlegendimage{area legend, fill=gray, draw=black}
+            \addlegendentry{Nut Shell};
+
+            \addplot[
+                forget plot,
+                rshift,
+                boxplot prepared={
+                    lower whisker =3,
+                    lower quartile=5,
+                    median        =6,
+                    upper quartile=7.5,
+                    upper whisker =12,
+                },
+            ] coordinates {};
+            \addplot[
+                lshift,
+                boxplot prepared={
+                    lower whisker =3,
+                    lower quartile=5.75,
+                    median        =7,
+                    upper quartile=8.375,
+                    upper whisker =9,
+                },
+            ] coordinates {};
+        \end{axis}
+    \end{tikzpicture}
+    \centering
+    \caption{Points that the participants got in the quiz}
+    \label{fig:quiz}
+\end{figure}
 
 \Cref{fig:participants} shows the number of participants per day in both groups.
 
-\begin{figure}[h]
+\begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
         \pgfplotstableread{ % Read the data into a table macro
             Label	Slot1	Slot2	Slot3	a	b	c
-            1	29	26	25	2	4	2
-            2	25	28	24	6	3	5
-            3	30	25	16	6	12	14
-            4	24	22	16	7	10	4
-            5	25	19	11	5	10	1
+            1	29	26	25	15	15	15
+            2	25	28	24	9	15	5
+            3	30	25	16	9	10	15
+            4	24	22	16	9	12	5
+            5	25	19	11	6	10	1
             6	0	0	0 	0	0	0
             7	0	0	0 	0	0	0
-            8	23	28	12	7	11	2
-            9	25	23	19	9	9	1
+            8	23	28	12	9	11	2
+            9	25	23	19	9	6	0
             10	0	0	0 	0	0	0
-            11	25	20	6 	3	8	0
+            11	25	20	6 	10	1	0
         }\datatable
 
         \begin{axis}[
@@ -1019,6 +1098,12 @@ Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um
                 ylabel=Participants,
                 ymajorgrids,
             ]
+
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Paper};
+            \addlegendimage{area legend, fill=gray, draw=black}
+            \addlegendentry{Nut Shell};
+
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};    % Plot the "First" column against the data index
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot2, x expr=\coordindex] {\datatable};
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot3, x expr=\coordindex] {\datatable};
@@ -1028,8 +1113,6 @@ Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um
             \addplot [fill=white, bar shift=.2cm] table [y=a, x expr=\coordindex] {\datatable};
             \addplot [fill=white, bar shift=.2cm] table [y=b, x expr=\coordindex] {\datatable};
             \addplot [fill=white, bar shift=.2cm] table [y=c, x expr=\coordindex] {\datatable};
-
-            \legend{Slot 1, Slot 2, Slot 3, sad, sadf, asfd}
         \end{axis}
     \end{tikzpicture}
     \centering
@@ -1037,9 +1120,81 @@ Wie oft mussten Sie bei der Bearbeitung der Aufgaben pro Tag durchschnittlich um
     \label{fig:participants}
 \end{figure}
 
+\Cref{fig:meta} shows the answers to the \emph{Nut Shell} related questions.
+
+\begin{figure}[tb]
+    \begin{tikzpicture}[trim axis left, trim axis right]
+        \begin{axis}[
+                boxplotcompare style,
+                ytick={1,2,3,4},
+                yticklabels={Good explanations, Helpful tips, Good exercises, Would use again},
+                boxplot,
+                y dir=reverse,
+                height=0.3\textheight,
+                width=\textwidth,
+                xmin=0.5,
+                xmax=10.5,
+                xmajorgrids,
+                ymin=0,
+                ymax=5,
+            ]
+
+            \addplot[%explanation
+                fill=gray,
+                boxplot prepared={
+                    lower whisker =5,
+                    lower quartile=8,
+                    median        =9,
+                    upper quartile=10,
+                    upper whisker =10,
+                    box extend=0.6,
+                },
+            ] coordinates {};
+            \addplot[%help
+                fill=gray,
+                boxplot prepared={
+                    lower whisker =2,
+                    lower quartile=5,
+                    median        =7,
+                    upper quartile=8,
+                    upper whisker =10,
+                    box extend=0.6,
+                },
+            ] coordinates {};
+            \addplot[%exercises
+                fill=gray,
+                boxplot prepared={
+                    lower whisker =4,
+                    lower quartile=7,
+                    median        =9,
+                    upper quartile=10,
+                    upper whisker =10,
+                    box extend=0.6,
+                },
+            ] coordinates {};
+            \addplot[%again
+                fill=gray,
+                boxplot prepared={
+                    lower whisker =5,
+                    lower quartile=8,
+                    median        =10,
+                    upper quartile=10,
+                    upper whisker =10,
+                    box extend=0.6,
+                },
+            ] coordinates {};
+        \end{axis}
+    \end{tikzpicture}
+    \centering
+    \caption{Answers to \emph{Nut Shell} related questions}
+    \label{fig:meta}
+\end{figure}
+
 \section{Discussion}
 
-(oral feedback?)
+The small number of participants that were left after day 8 a problem. The results are warped, as just those participants who had fun and learned something stayed, which explains why the scores are relatively close to each other.
+
+That is why we evaluated the loss of participants over time. In this case, 63.8\% of the \emph{Nut Shell} users stayed until the last day. Of the exercise sheet users, only 24.4\% stayed.
 
 \chapter{Conclusions}
 
@@ -1055,7 +1210,9 @@ Right now, typing errors can be catched by defining some command-rules by hand. 
 
     (goal-oriented syntax)
 
-I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it.
+    (automated feedback for authors through logging)
+
+    I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it. During the preparatory course, a student told us he would like to use the \emph{Nut Shell} to teach the command line to pupils at his old school.
 
 \cleardoublepage
 \part*{Appendix}
@@ -1077,6 +1234,10 @@ The framework was implemented in Go (src), a compiled, statically typed language
 (kr/pty for terminal emulation)
 
     limesurvey
+
+\section{Parsing}
+
+(How YACC works)
 
 \section{High-level design}
 
