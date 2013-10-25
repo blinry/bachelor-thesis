@@ -6,6 +6,7 @@
 \usepackage[ngerman,english]{babel}
 
 \usepackage{blindtext}
+\usepackage{multicol}
 \usepackage{pgfplots, pgfplotstable}
     \pgfplotsset{compat=1.8}
     \usepgfplotslibrary{statistics}
@@ -98,12 +99,24 @@
 Institute for Programming and Reactive Systems\\
 Prof. Dr. Ursula Goltz\\[\baselineskip]
 Advisor: Dr. Werner Struckmann}
-%\uppertitleback{I hereby declare that this thesis is my own unaided work. All sources used are acknowledged as references.
+\uppertitleback{
+    \subsection*{Affidavit}
+    This thesis is my own unaided work. All sources used are acknowledged as references.
+
+    Ich habe diese Abschlussarbeit selbstständig verfasst. Alle Quellen wurden kenntlich gemacht.
+    \\\\
+    Braunschweig, 2013--11--03
+    \vskip 10mm
+    \hfill\hrulefill
+}
 
 %\vspace{2cm}
 
 %Braunschweig, 2013-11-03 \dotfill}
-\lowertitleback{I would like to thank the following people for their support in the creation of this thesis:
+\lowertitleback{
+\subsection*{Acknowledgements}
+
+I would like to thank the following people for their support in the creation of this thesis:
 
 Hauke Baller,
 Arne Brüsch,
@@ -113,10 +126,12 @@ Moritz Mühlhausen,
 Markus Reschke,
 Werner Struckmann,
 Wolfgang Morr,
-Leslie Wöhler
-\\[\baselineskip]
-This document was created using \LaTeXe\ and \KOMAScript\ and edited with \textsc{Vim}. The figures are created with \texttt{pgfplots}, key combinations with \texttt{menukeys}. The \textsc{Latin Modern} font family.
-}
+and Leslie Wöhler.
+
+\subsection*{Colophon}
+
+This document was created using \LaTeXe\ by Leslie Lamport and contributors, and \KOMAScript\ by Frank Neukam, Markus Kohm, and Axel Kielhorn. The figures were created using PGFPlots by Christian Feuersänger, key combinations using \texttt{menukeys} by Tobias Weh. The text is set in the Latin Modern font family by Bogusław Jackowski, Janusz M. Nowacki and Marcin Woliński.}
+
 \begin{document}
 
 \newgeometry{left=2cm,right=2cm}
