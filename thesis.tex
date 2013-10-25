@@ -7,6 +7,8 @@
 
 \usepackage{blindtext}
 \usepackage{multicol}
+\usepackage{graphicx}
+    \graphicspath{ {images/} }
 \usepackage{pgfplots, pgfplotstable}
     \pgfplotsset{compat=1.8}
     \usepgfplotslibrary{statistics}
@@ -142,9 +144,6 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
 %\pagenumbering{roman}
 
 \begin{abstract}
-
-    \blindtext
-
     (Purpose)
 
     (Design + evaluation methods)
@@ -156,8 +155,6 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
 
 \selectlanguage{ngerman}%
 \begin{abstract}
-    \blindtext
-
     (German translation)
 \end{abstract}
 \selectlanguage{english}%
@@ -165,22 +162,30 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
 \setcounter{tocdepth}{2}
 \tableofcontents
 
-%\cleardoublepage
-%\pagenumbering{arabic}
-
 \chapter{Introduction}
 
-Command line interfaces are powerful, efficient methods to interact with computers, but they often have a steep learning curve.
+Nowadays, when humans interact with computers, most of the time, they use a graphical user interface. It provides buttons and other visual elements the user can interact with using a mouse. (ref: The Demo?) Before this interaction method was invented, computers had a text-only interface. The user would type a text command, and the machine would execute it. These \emph{Command Line Interfaces} provide powerful, efficient means to interact with computers (finde ich ne ref zu efficient?), 
 
-The common way of teaching command line interfaces is a static text. This representation has several disadvantages: The users have to shift their attention forth and back between the tutorial text and the system they are learning, which could make the learning process ineffective. The text may set goals, but those aren't affirmed when they are reached. Finally, when the user makes a syntactical or semantical mistake, the text does not respond to help the user fix it.
+As CLIs have no means of telling the user what can be done with it, they are not self-evident. This is why they often have a steep learning curve, and a novice user needs to be taught how to use it.
 
-This thesis describes a system that strives to fix those problems. The core idea is to interlace the tutorial text and the command line output so that the text can respond to the state of the command line system. This approach is inspired by text adventures.
+Most approaches to teach command line interfaces contain text: There are books and manuals, online tutorials and exercise sheets. But these text-based mediums pose several problems: The users have to shift their attention back and forth between the explaining text and the system they are learning, which slows down the learning process. The text might set tasks and goals, but has no possibility to check and confirm when the user reaches them. Finally, when the user makes a syntactical or semantical mistake, he is on his own---the text remains static and cannot help him.
 
-(Aufgabenstellung highlighten!)
+This thesis describes a system that provides a much more direct, interactive teaching approach. The core idea is to interlace the tutorial text and the command line output so that the text can respond to the state of the command line system.
+
+This approach is inspired by text adventures. \Cref{fig:zork} demonstrates one of the earliest programs of this kind, \textsc{ZORK}, originally released in 1979 by members of the MIT Dynamic Modelling Group (ref: wp). In the game, the player types what he wants his virtual character to do in the game world, the game responds with a description of what effects these actions produce. (why is this vorbild?)
+
+\begin{figure}[tb]
+    \includegraphics[width=\textwidth]{zork1.png}
+    \centering
+    \caption{ZORK!}
+    \label{fig:zork}
+\end{figure}
 
 The framework can be used to learn and teach arbitrary command line interfaces, for example system shells (bash, zsh, …), read eval print loops of various programming languages (Ruby, Python, Haskell, …), tools like Git or other VCS's, Makefiles, compiler toolchains or the UNIX directory structure.
 
 The main research question of this thesis is whether this approach is in some way "better" than the traditional text tutorials.
+
+\section{Prior approaches}
 
 In the technical community, there have been several approaches in creating interactive tutorials for command line interfaces, most notably (Try Ruby/Git/Haskell).
 
@@ -1247,6 +1252,8 @@ Right now, typing errors can be catched by defining some command-rules by hand. 
     (goal-oriented syntax)
 
     (automated feedback for authors through logging)
+
+    (scrollback was a problem, said students)
 
     I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it. During the preparatory course, a student told us he would like to use the \emph{Nut Shell} to teach the command line to pupils at his old school.
 
