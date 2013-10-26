@@ -57,7 +57,7 @@
     \newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
     \newcommand{\cursor}{\invert{ }}
     \newcommand{\escape}[1]{\textasciicircum #1}
-\usepackage[hidelinks]{hyperref}
+\usepackage[linktoc=page]{hyperref}
 \usepackage{cleveref}
 \usepackage[os=win]{menukeys}
     \renewmenumacro{\keys}[+]{shadowedroundedkeys}
@@ -107,9 +107,9 @@ Advisor: Dr. Werner Struckmann}
 
     Ich habe diese Abschlussarbeit selbstständig verfasst. Alle Quellen wurden kenntlich gemacht.
     \\\\
+    \vskip 5mm
     Braunschweig, 2013--11--03
-    \vskip 10mm
-    \hfill\hrulefill
+    \hskip 1cm \dotfill
 }
 
 %\vspace{2cm}
@@ -170,9 +170,9 @@ As CLIs have no means of telling the user what can be done with it, they are not
 
 Most approaches to teach command line interfaces contain text: There are books and manuals, online tutorials and exercise sheets. But these text-based mediums pose several problems: The users have to shift their attention back and forth between the explaining text and the system they are learning, which slows down the learning process. The text might set tasks and goals, but has no possibility to check and confirm when the user reaches them. Finally, when the user makes a syntactical or semantical mistake, he is on his own---the text remains static and cannot help him.
 
-This thesis describes a system that provides a much more direct, interactive teaching approach. The core idea is to interlace the tutorial text and the command line output so that the text can respond to the state of the command line system.
+This thesis describes a system that provides a much more direct, interactive teaching approach. The core idea is to interlace the tutorial text and the command line output and to make the tutorial watch the user's commands, the commands' output and the state of the commnd line system, so that the text can respond directly to the user's actions.
 
-This approach is inspired by text adventures. \Cref{fig:zork} demonstrates one of the earliest programs of this kind, \textsc{ZORK}, originally released in 1979 by members of the MIT Dynamic Modelling Group (ref: wp). In the game, the player types what he wants his virtual character to do in the game world, the game responds with a description of what effects these actions produce. (why is this vorbild?)
+This approach is inspired by text adventures. \Cref{fig:zork} demonstrates one of the earliest programs of this kind, \textsc{ZORK}, originally released in 1979 by members of the MIT Dynamic Modelling Group (ref: wp). In the game, the player types what he wants his virtual character to do in the game world, the game responds with a description of what effects these actions produce. The tutorials created with the framework described in this thesis work similary, in that they provide direct feedback to the user's commands and provide support when he makes mistakes or has problems (note ZORK's response to \texttt{examine mailbox}).
 
 \begin{figure}[tb]
     \includegraphics[width=\textwidth]{zork1.png}
@@ -181,41 +181,56 @@ This approach is inspired by text adventures. \Cref{fig:zork} demonstrates one o
     \label{fig:zork}
 \end{figure}
 
-The framework can be used to learn and teach arbitrary command line interfaces, for example system shells (bash, zsh, …), read eval print loops of various programming languages (Ruby, Python, Haskell, …), tools like Git or other VCS's, Makefiles, compiler toolchains or the UNIX directory structure.
+The framework is designed to support arbitrary command line interfaces, for example system shells (\texttt{bash}, \texttt{zsh}, …) or read-eval-print loops of various programming languages (Ruby, Python, Haskell, …), but can also be used to teach subtopics, for example tools like Git, SVN or other version control systems, Makefiles, compiler toolchains or the UNIX directory structure.
 
-The main research question of this thesis is whether this approach is in some way "better" than the traditional text tutorials.
+Goal of this thesis is to design, implement and evaluate a framework that allows the creation of tutorials with the described teaching approach. In reference to the term \emph{in a nutshell}, which means “to the point” or “short and sweet”, and because the tutorials have a shell-like user interface, we call this framework the \emph{Nut Shell}.
 
-\section{Prior approaches}
+\section{Prior work}
 
-In the technical community, there have been several approaches in creating interactive tutorials for command line interfaces, most notably (Try Ruby/Git/Haskell).
+In the technical community, there have been several approaches in creating interactive tutorials for command line interfaces.
 
-(What's missing in them)
+\emph{Try Ruby} was an interactive online tutorial that would provide an introduction to the Ruby scripting language. An anonymous programmer called \_why first published it at the end of 2005.\cite{tryrubydone} He took the site offline in early 2009, but some members of the Ruby community continue to develop it. (persistence?)
+
+The American company \emph{Codecademy} currently deploys several interactive tutorials, which focus on teaching programming in Ruby, Python, JavaScript and PHP. The tutorials consist of multiple exercises, in each of which the user gets a piece of unfinished code and an exercise and then is supposed to fix or finish the code so that it fulfills some conditions.
+
+\emph{Code School}\footnote{\url{https://www.codeschool.com}} follows a more interactive approach: They offer courses about Ruby, JavaScript, HTML/CSS, R and Git, where the user can enter lines and gets feedback whether that was the solution for the current task.
+
+While these implementations of interactive tutorials pose drastic improvements over classical tutorials, they still have several problems:
+
+The presented tutorials are linear: Each task has to be solved to get to the next one.
+
+Additionally, they do not offer that level of persistence that normal interaction with the command line would: As every entered line is run seperately, the system has no internal state.
+
+While they emulate some editing capabilities regarding command-line editing, to use comfort functions like accessing the command history or using tab-completion is impossible.
+
+The \emph{Nut Shell} will address all of these shortcomings.
 
 \section{Overview}
 
-bottom-up...
+%To allow fast creation of tutorials, we designed a domain specific language tailored to the needs of the tutorial's author.
 
-At the core, the \emph{Nut Shell} is a wrapper around a common command line process.
+%The main research question of this thesis is whether this approach is in some way "better" than text tutorials.
 
-(Diagram of loop?)
+This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}. We present the design of the framework in a bottom-up fashion:
 
-The goal is to be able to adapt to any command line interface---(ch x) describes how this abstraction is achieved.
+In \cref{sec:preliminaries}, we introduce and define some of the framework's central topics and techniques.
 
-The \emph{Nut Shell} lets through the command line's output unchanged, and will only add annotations.
+At the lowest level, the \emph{Nut Shell} employs a wrapper around a command line process. This wrapper needs to be able to adapt to many different command line interfaces---\cref{sec:cli} describes how this abstraction is achieved.
 
-This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}.
+%Design-wise, the framework consists of three layers:
 
-Design-wise, the framework consists of three layers:
+%- A lowlevel layer that abstracts the target command line interface to a common API.
 
-- A lowlevel layer that abstracts the target command line interface to a common API.
+%- The highest layer parses and interprets the nutsh files and recudes them to API calls of the lower layer.
 
-- The highest layer parses and interprets the nutsh files and recudes them to API calls of the lower layer.
+%(Diagram: Layers)
 
-(Diagram: Layers)
 
-Implementation details follow in (ch x).
+To find out whether this teaching approach has benefits compared to tutorials based on static text, the framework was applied and evaluated in an eight-day study with about 120 participants, this is described in \cref{sec:evaluation}.
 
-To find out whether this teaching approach has benefits, the framework was applied and evaluated in an eight-day study with about xx participants, this is described in (ch x).
+The framework was implemented in Go, we give implementation details follow in \cref{sec:implementation}.
+
+\Cref{sec:nutshexample} on \cpageref{sec:nutshexample} shows an example session of a bash tutorial created with the \emph{Nuth Shell}. It might be beneficial for the reader to look at this example before continuing to read.
 
 \section{Notation}
 \label{sec:ebnf}
@@ -235,6 +250,7 @@ Repetition  = "{" Expression "}" .
 \end{ebnf}
 
 \chapter{Preliminaries}
+\label{sec:preliminaries}
 
 \section{Command Line Interface}
 \label{sec:cli}
@@ -306,7 +322,12 @@ To be a target for the \emph{Nut Shell}, a command line program needs to have th
 
 All of the command line programs mentioned above have those features and thus can be used as \emph{targets}.
 
+\chapter{Principles}
+
+The \emph{Nut Shell} lets through the command line's output unchanged, and will only add annotations.
+
 \chapter{Parsing the Command Line}
+\label{sec:cli}
 
 In this thesis, we treat the target command line process as a black box having input and output streams of Unicode characters. To enable the \emph{Nut Shell} to check conditions on the user's interaction, it needs to parse the output accordingly. The interesting parts in this context are the following three, which correspond to the phases described in \cref{sec:cli}:
 
@@ -550,6 +571,8 @@ Because this command is used so often, it can be abbreviated to:
 "This is the short form."
 \end{nutsh}
 %
+The \texttt{say} function supports two ways of highlighting parts of the text: Text enclosed in backticks will be displayed in a second color, text enclosed in asterisks in a third. As a convention, backticks are used to mark parts of commands or file names, and asterisks are used to emphazise parts of a sentence. These conventions have been adopted from John Gruber's Markdown \url{http://daringfireball.net/projects/markdown/syntax}.
+
 To execute a command in the target process, you use \texttt{run()}. The value of this statement is the command's output.
 
 \begin{nutsh}
@@ -754,6 +777,7 @@ By convention, when a prompt is encountered whose expects are all reached, the f
 (c0/c1)...
 
 \chapter{Application and Evaluation}
+\label{sec:evaluation}
 
 To find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to traditional teaching methods, we created an example tutorial and conducted a two-week course with a subsequent survey.
 
@@ -1243,19 +1267,19 @@ That is why we evaluated the loss of participants over time. In this case, 63.8\
 
 \chapter{Limitations and Future Directions}
 
-Right now, typing errors can be catched by defining some command-rules by hand. The expect-Statements could be used to automate this detection of typing errors by applying (algorithm).
+Right now, typing errors can be catched by defining some \texttt{command} checks by hand. The \texttt{expect}-Statements could be used to automate this detection of typing errors by applying (algorithm).
 
-    (Simplified prompt syntax)
+While the syntax of the \texttt{prompt} makes the semantic of the \emph{nutsh} files quite clear, in practical use it seems cumbersome, as it is repeated so often. The syntax could be simplified here so that blocks of \texttt{if} clauses imply a \texttt{prompt} block around it.
 
-    (Lesson dependency tree)
+Right now, the lessons of a tutorial form a linear order. It would make sense to structure them in a dependency graph, in which the author can specify for each lesson, which other lessons have to be finished before that. This would give the user more freedom to navigate through the tutorial on his own behalf.
 
-    (goal-oriented syntax)
+%goal-oriented syntax?
 
-    (automated feedback for authors through logging)
+The users feedback while using the tutorial can be very useful to improve it. This feedback collection could be automated by recording the user's interaction and tracking their progress over time. For example, when users do not reach new \texttt{prompt} statements for a longer time, or enter disproportionately many commands in one \texttt{prompt} loop this could be an indication that this section is too hard and should get more hints. The wrong commands can also be automatically collected, analyzed, and be presented to the author so that he can create appropriate hints in the lesson.
 
-    (scrollback was a problem, said students)
+In the evaluation, it was a problem when the students entered many commands and had to scroll the terminal output up to read the tutorial text. The \emph{Nut Shell} should provide a special command to repeat the last few tutorial lines.
 
-    I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it. During the preparatory course, a student told us he would like to use the \emph{Nut Shell} to teach the command line to pupils at his old school.
+During the preparatory course, a student told us he would like to use the \emph{Nut Shell} to teach the command line to pupils at his old school. I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it.
 
 \cleardoublepage
 \part*{Appendix}
@@ -1269,6 +1293,7 @@ Right now, typing errors can be catched by defining some command-rules by hand. 
 (Execution output)
 
 \chapter{Implementation}
+\label{sec:implementation}
 
 \section{Used technologies}
 
@@ -1304,6 +1329,9 @@ homepage, usage instructions
 (...)
 
 \begin{thebibliography}{99}
+    \bibitem{tryrubydone}
+        \_why. “Try Ruby is Done, Makes HTML Now.” \emph{RedHanded.} 2005--12--22. Web. \url{https://web.archive.org/web/20051224030709/http://redhanded.hobix.com/inspect/tryRubyTutorialIsDone.html}
+
     \bibitem{}
         Jerry Peek; Tim O'Reilly; Mike Loukides et. al: \emph{Unix Power Tools}. 2nd Edition. O'Reilly \& Associates, Inc, 1997
 
