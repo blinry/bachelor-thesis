@@ -1,17 +1,17 @@
 lesson_name("Compressing files - tar, gzip, bzip2")
 make_home
-run(`rm -f "$ROOT/kitchen/elephant*" `)
-run(`rm -f "$ROOT/kitchen/fridge.tar" `)
-run(`rm -rf "$ROOT/kitchen/fridge" `)
+run(`rm -f "$ROOT/kitchen/elephant*"`)
+run(`rm -f "$ROOT/kitchen/fridge.tar"`)
+run(`rm -rf "$ROOT/kitchen/fridge"`)
 run(`mkdir "$ROOT/kitchen/fridge"`)
 
 // create a file that contains 10 MiB of ascending numbers
-run(`seq 1 2000000 | tr -d '\n' | head -c $((1024*1024*10) >
+run(`seq 1 2000000 | tr -d '\n' | head -c $((1024*1024*10)) >
      "$ROOT/kitchen/elephant"`)
 
 "Do you know the old joke 'How do you put an elephant into a fridge?'"
 
-"'Open the fridge, put in the elephant, and close the door'. Try it, we
+"\"Open the fridge, put in the elephant, and close the door\". Try it, we
 delivered a fresh elephant into your kitchen!"
 
 // check whether there's an elephant (with suffix 'n') in the fridge
@@ -165,7 +165,7 @@ stop_elephant(""), stop_elephant("2") {
 "Enjoy your meal! When you're ready to complete the lesson, say \"done\"!"
 
 prompt {
-  if ready {
+  if done {
     expect("echo done")
     break
   }

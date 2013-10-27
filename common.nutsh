@@ -10,6 +10,10 @@ def make_home {
     run(`mkdir -p kitchen bedroom livingroom`)
 }
 
+def exit_code {
+    return(run("echo $?"))
+}
+
 def runs(cmd) {
     run(cmd)
     return(exit_code == "0")

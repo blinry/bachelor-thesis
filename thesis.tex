@@ -74,9 +74,14 @@
     \lstdefinelanguage{nutsh}{
         morekeywords={if,else,prompt,def,break,return},
         sensitive=false,
-    morecomment=[l]{//},
-    morecomment=[s]{/*}{*/},
-    morestring=[b]"
+        morecomment=[l]{//},
+        morecomment=[s]{/*}{*/},
+        morestring=[b]"
+    }
+    \lstdefinelanguage{commandline}{
+        sensitive=false,
+        morecomment=[l]{\ \ \ \ },
+        morecomment=[l][\bfseries]{\$},
     }
     \lstset{
         aboveskip=10pt,
@@ -1311,7 +1316,7 @@ This is an acutal lesson from the preparatory course, translated into English. T
 
 \lstinputlisting[title=compress.nutsh,language=nutsh,frame=tbrl,basicstyle=\ttfamily\footnotesize]{compress.nutsh}
 
-(Execution output)
+\lstinputlisting[title=Example session of the compress lesson,language=commandline,frame=tbrl,basicstyle=\ttfamily\footnotesize]{compress.output}
 
 \chapter{Implementation}
 \label{sec:implementation}

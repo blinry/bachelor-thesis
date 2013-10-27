@@ -1,0 +1,104 @@
+    Do you know the old joke 'How do you put an elephant into a fridge?' 
+
+    "Open the fridge, put in the elephant, and close the door". Try it, we 
+    delivered a fresh elephant into your kitchen! 
+
+$ cd kitchen
+$ ls
+elephant fridge
+$ mv elephant fridge
+
+    [The elephant does not fit into the fridge] 
+
+    Oh, it doesn't seem to be that easy. Can you find out how big the file 
+    is? The manpage of ls will help you! 
+
+$ ls -l
+total 21276
+-rw------- 1 seb users 10485760 27. Okt 22:25 elephant
+drwx------ 2 seb users     4096 27. Okt 22:25 fridge
+
+    Okay, about ten million bytes. ls has the option 
+    -h to display that in a more comprehensible order of 
+    magnitude. 
+
+$ ls -sh
+total 21M
+ 10M elephant   4.0K fridge
+
+    10 megabytes? Indeed, the fridge isn't that large. 
+
+    We have to make the elephant smaller. There are several ways to 
+    compress files - one of the most common under Linux is gzip. 
+    Compress the elephant with that program and look at it's size again. 
+
+$ gzip -f elephant
+$ ls -sh
+total 15M
+ 3.4M elephant.gz  4.0K fridge
+
+    That sounds much better. 
+
+    Because that went so well, we've delivered a second elephant to the 
+    hallway. Get it into the kitchen and and compress it, this time with 
+    bzip2. How large is the file this time? 
+
+$ cp ../elephant2 .
+$ bzip2 -f elephant2
+$ ls -sh
+total 6.1M
+1.9M elephant2.bz2  3.4M elephant.gz  4.0K fridge
+
+    The bzip2 compression algorithm takes more time, but creates smaller 
+    files. 
+
+    The two compressed elephants now fit in the fridge comfortably! (Hint: 
+    Using wildcards you can move both files at once!) 
+
+$ mv elephant* fridge
+
+    These commands only compress single files. To compress a folder, you 
+    have to combine it and its contents to a single file, you can do that 
+    with tar -c -f name_of_the_archive.tar folder. 
+
+    -c means "create", -f for the name of the 
+    resulting file. tar is short for "tape archive" originates 
+    from the good old times, when magnetic tapes were used to store files. 
+
+    Please combine the fridge to fridge.tar. 
+
+$ tar -c -f fridge.tar fridge
+
+    The compression commands replace the original file, but tar 
+    leaves the source folder intact. Please delete the original fridge. 
+
+$ rm -rf fridge
+
+    Good, and now compress the so-called "tar ball" with a compression 
+    method of your choice. 
+
+$ gzip fridge.tar
+
+    You can now pick up the compressed fridge with the compressed 
+    elephants, put it in your pocket and take it with you. :-) 
+
+    And eventually, we want to get the elephants back. Reverse your steps 
+    and put both elephants back into the kitchen. 
+
+    Use the commands gunzip and bunzip2, as well as 
+    tar with the arguments -x -f 
+    name_of_the_archive.tar (-x means "extract"). 
+
+$ tar xzf fridge.tar.gz
+$ gunzip fridge/elephant.gz
+
+    [The elephant does not fit into the fridge] 
+
+$ bunzip2 fridge/elephant2.bz2
+
+    [The elephant does not fit into the fridge] 
+
+    Enjoy your meal! When you're ready to complete the lesson, say "done"! 
+
+$ echo done
+done
