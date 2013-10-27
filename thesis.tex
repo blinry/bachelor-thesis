@@ -1,4 +1,4 @@
-\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,11pt,appendixprefix=true]{scrreprt}
+\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,12pt,appendixprefix=true]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -86,7 +86,7 @@
         showstringspaces=false,
         literate={`}{\`}1,
     }
-    \lstdefinestyle{ebnfstyle}{language=,frame=tbrl}
+    \lstdefinestyle{ebnfstyle}{language=,frame=single}
     \lstdefinestyle{nutshstyle}{language=nutsh,xleftmargin=\parindent}
     \lstnewenvironment{ebnf}{\lstset{style=ebnfstyle}}{}
     \lstnewenvironment{nutsh}{\lstset{style=nutshstyle}}{}
@@ -303,20 +303,7 @@ A classical computer terminal was the \textsc{VT100}, introduced 1978 by \textsc
 
 To make text input more comfortable, many CLIs offer a wide range of editing capabilities. They support key combinations for deleting characters, words or whole lines, and often maintain a history of entered commands, so that the user can reuse them if necessary.
 
-To avoid having to implement these functions themselves, many many (quot) programs use a library called \emph{readline} (ref). This library has some default keybindings, which are listed
-
-(come from emacs)
-
-\begin{table}[tb]
-    \begin{tabular}{r|r}
-        Key combination & effect \\
-        \hline
-        Ctrl + U & delete line \\
-    \end{tabular}
-    \caption{Readline key combinations}
-\end{table}
-
-%The Nut Shell lets through the command line's output unchanged, and will only add annotations.
+To avoid having to implement these functions themselves, many (quot) programs use a library called \emph{readline} (ref). This library has some default keybindings, which originate from the Emacs text editor.
 
 \chapter{Parsing the Command Line}
 \label{sec:cli}
@@ -536,7 +523,7 @@ The following character sequences have special meanings in \emph{nutsh}:
 
 \minisec{String Literals}
 
-There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}. Raw string literals are enclosed with back quotes (\texttt{\`}). They may contain any character except the back quote; the characters are interpreted literally. Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes.
+There are two types of string literals, which have the same syntax as in Go: \emph{raw string literals} and \emph{interpreted string literals}. Raw string literals are enclosed with back quotes (\texttt{\`}). They may contain any character except the back quote; the characters are interpreted literally. Interpreted string literals are enclosed with double quotes (\texttt{"}) and may contain backslash escapes; Their exact specification can be found in the Go specification\cite{gospec}.
 
 \begin{ebnf}
 string = raw_string | interpreted_string .
@@ -814,7 +801,7 @@ In the fall semester 2013--2014, 150 students enrolled in the course. For this s
 
 The course roughly covered the these topics: The \textsc{UNIX} file system and how to manipulate it; various text editors like Vim, Emacs, and Gedit; process management; command line tools for text manupulation like \texttt{grep}, \texttt{sort}, or \texttt{patch}; various shell mechanism like output redirection and the command history; shell scripts; automatition with Makefiles; accessing remote servers with \textsc{SSH}; typesetting documents with \LaTeX; understanding and repairing programs written in \textit{Java}; and version control with \textit{Git}.
 
-The newly created \textit{Nut Shell} tutorial kept these topics and their order. The material was divided into 30 invidiual lessons, each of which covered one specifi topic. In total, the tutorial contains 2875 lines of \textit{nutsh} code. In total, it took about 40 hours to write and test the lessons. For an example lesson, refer to \cref{sec:nutshexample}.
+The newly created \textit{Nut Shell} tutorial kept these topics and their order. The material was divided into 30 invidiual lessons, each of which covered one specific topic. Each day, new lessons were made available. In total, the tutorial contained 2875 lines of \textit{nutsh} code. It took about 30 hours to write and test the lessons. For an example lesson, refer to \cref{sec:nutshexample}.
 
 \section{Style}
 
@@ -859,6 +846,15 @@ The second part of the survey was a test with 11 questions about different topic
     \item What is the file \texttt{~/.bashrc} used for?
     \item You don't want to type \texttt{ls -alR} all the time, but create a short hand form. Which possibilities do you have and what is the corresponding command?
     \item What are pipes used for and how do you use them? Write an example command.
+\end{enumerate}
+
+The third batch of the questions was only given to the students who had used the Nut Shell to assess strenghts and weaknesses of the created tutorial:
+
+\begin{enumerate}
+    \item The Nut Shell did a good job explaining new material.
+    \item When I encountered problems, the Nut Shell gave helpful hints.
+    \item The exercises were helpful to understand the topics on hand.
+    \item When attending another course, I would like to use the Nut Shell again.
 \end{enumerate}
 
 \section{Results}
@@ -1270,7 +1266,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
         \end{axis}
     \end{tikzpicture}
     \centering
-    \caption{Number of participants per day}
+    \caption{Number of participants per day. Days 6 and 7 were a weekend, there was no course on day 10. From bottom to top, the bar's segments represent first, second and third time slot.}
     \label{fig:participants}
 \end{figure}
 
@@ -1309,9 +1305,11 @@ It's likely that the Nut Shell will be used for the upcoming preparatory courses
 \chapter{Example Lesson}
 \label{sec:nutshexample}
 
-This is an acutal lesson from the preparatory course. The students already lerned how to move and display files.
+This is an acutal lesson from the preparatory course, translated into English. The students already learned how to move and display files. The first file contains some reusable functions shared by the lessons, the second one is the actual lesson.
 
-\lstinputlisting[language=nutsh,frame=tbrl]{compress.nutsh}
+\lstinputlisting[title=common.nutsh,language=nutsh,frame=tbrl,basicstyle=\ttfamily\footnotesize]{common.nutsh}
+
+\lstinputlisting[title=compress.nutsh,language=nutsh,frame=tbrl,basicstyle=\ttfamily\footnotesize]{compress.nutsh}
 
 (Execution output)
 
@@ -1356,8 +1354,11 @@ homepage, usage instructions
     \bibitem{tryrubydone}
         \_why. “Try Ruby is Done, Makes HTML Now.” \emph{RedHanded.} 2005--12--22. Web. \url{https://web.archive.org/web/20051224030709/http://redhanded.hobix.com/inspect/tryRubyTutorialIsDone.html}
 
-    \bibitem{}
-        Jerry Peek; Tim O'Reilly; Mike Loukides et. al: \emph{Unix Power Tools}. 2nd Edition. O'Reilly \& Associates, Inc, 1997
+    \bibitem{upt}
+        Peek, Jerry; O'Reilly, Tim; Loukides, Mike et. al: \emph{Unix Power Tools}. 2nd Edition. O'Reilly \& Associates, Inc, 1997
+
+    \bibitem{gospec}
+        Google. “The Go Programming Language Specification”  2013--05--08. Web. \url{http://golang.org/ref/spec}
 
     \bibitem{}
         dragon book

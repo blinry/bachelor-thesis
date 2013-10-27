@@ -1,0 +1,32 @@
+def go_home {
+    run(`ROOT="$HOME"/.nutsh`)
+    run(`mkdir -p "$ROOT"`)
+    run(`cd "$ROOT"`)
+}
+
+def make_home {
+    go_home
+    run(`cd "$ROOT"`)
+    run(`mkdir -p kitchen bedroom livingroom`)
+}
+
+def runs(cmd) {
+    run(cmd)
+    return(exit_code == "0")
+}
+
+def test(condition) {
+    return(runs("[[ "+condition+" ]]"))
+}
+
+def dir(d) {
+    return(test("-d \""+d+"\""))
+}
+
+def file(f) {
+    return(test("-f \""+f+"\""))
+}
+
+def done {
+    return(command =~ `echo\s+(done|ready)`)
+}
