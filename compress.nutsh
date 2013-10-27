@@ -1,0 +1,172 @@
+lesson_name("Compressing files - tar, gzip, bzip2")
+make_home
+run(`rm -f "$ROOT/kitchen/elephant*" `)
+run(`rm -f "$ROOT/kitchen/fridge.tar" `)
+run(`rm -rf "$ROOT/kitchen/fridge" `)
+run(`mkdir "$ROOT/kitchen/fridge"`)
+
+// create a file that contains 10 MiB of ascending numbers
+run(`seq 1 2000000 | tr -d '\n' | head -c $((1024*1024*10) >
+     "$ROOT/kitchen/elephant"`)
+
+"Do you know the old joke 'How do you put an elephant into a fridge?'"
+
+"'Open the fridge, put in the elephant, and close the door'. Try it, we
+delivered a fresh elephant into your kitchen!"
+
+// check whether there's an elephant (with suffix 'n') in the fridge
+def elephant_in_fridge(n) {
+  return(file(`"$ROOT/kitchen/fridge/elephant"`+n))
+}
+
+// when there's an elephant in the fridge, show an error and remove it
+def stop_elephant(n) {
+  if elephant_in_fridge(n) {
+    "[The elephant does not fit into the fridge]"
+    run(`mv "$ROOT/kitchen/fridge/elephant`+n+
+        `" "$ROOT/kitchen/elephant"`+n)
+  }
+}
+
+prompt {
+  if elephant_in_fridge("") {
+    stop_elephant("")
+    expect("cd kitchen; mv elephant fridge")
+    break
+  }
+}
+
+stop_elephant(""), stop_elephant("2") {
+  "Oh, it doesn't seem to be that easy. Can you find out how big the file
+  is? The manpage of `ls` will help you!"
+
+  prompt {
+    if output =~ "10M" {
+      expect("ls -sh")
+      "10 megabytes? Indeed, the fridge isn't that large."
+      break
+    }
+    if output =~ "10240" {
+      expect("ls -s")
+      "Okay, about ten thousand kilobytes. `ls` has the option `-h` to
+      display that in a more comprehensible order of magnitude."
+    }
+    if output =~ "10485760" {
+      expect("ls -l")
+      "Okay, about ten million bytes. `ls` has the option `-h` to display
+      that in a more comprehensible order of magnitude."
+    }
+  }
+
+  "We have to make the elephant smaller. There are several ways to
+  compress files - one of the most common under Linux is `gzip`. Compress
+  the elephant with that program and look at it's size again."
+
+  prompt {
+    if file(`"$ROOT/kitchen/elephant.gz"`) {
+      // depending on the locale, the decimal mark can be a comma or a dot
+      if output =~ `\d[.,]\dM` {
+        expect("gzip -f elephant; ls -sh")
+        break
+      }
+    }
+  }
+
+  "That sounds much better."
+
+  "Because that went so well, we've delivered a second elephant to the
+  hallway. Get it into the kitchen and and compress it, this time with
+  `bzip2`. How large is the file this time?"
+
+  run(`seq 1 2000000 | tr -d '\n' | head -c $((1024*1024*10)) >
+      "$ROOT/elephant2"`)
+
+  prompt {
+    if file(`"$ROOT/kitchen/elephant2.bz2"`) {
+      if output =~ `\d[.,]\dM` {
+        expect("cp ../elephant2 .; bzip2 -f elephant2; ls -sh")
+        break
+      }
+    }
+  }
+
+  "The bzip2 compression algorithm takes more time, but creates smaller
+  files."
+
+  "The two compressed elephants now fit in the fridge comfortably!
+  (Hint: Using wildcards you can move both files at once!)"
+
+  prompt {
+    if file(`"$ROOT/kitchen/fridge/elephant.gz"`) &&
+       file(`"$ROOT/kitchen/fridge/elephant2.bz2"`) {
+      expect(`mv elephant* fridge`)
+      break
+    }
+  }
+
+  "These commands only compress single files. To compress a folder, you
+  have to combine it and its contents to a single file, you can do that
+  with `tar -c -f name_of_the_archive.tar folder`."
+
+  "`-c` means \"create\", `-f` for the name of the resulting file. `tar`
+  is short for \"tape archive\" originates from the good old times, when
+  magnetic tapes were used to store files."
+
+  "Please combine the fridge to `fridge.tar`."
+
+  prompt {
+    if file(`"$ROOT/kitchen/fridge.tar"`) {
+      expect("tar -c -f fridge.tar fridge")
+      break
+    }
+  }
+
+  "The compression commands replace the original file, but `tar` leaves
+  the source folder intact. Please delete the original fridge."
+
+  prompt {
+    if ! dir(`"$ROOT/kitchen/fridge"`) {
+      expect("rm -rf fridge")
+      break
+    }
+  }
+
+  "Good, and now compress the so-called \"tar ball\" with a compression
+  method of your choice."
+
+  prompt {
+    if file(`"$ROOT/kitchen/fridge.tar.gz"`) ||
+       file(`"$ROOT/kitchen/fridge.tar.bz2"`) {
+      expect("gzip fridge.tar")
+      break
+    }
+  }
+
+  "You can now pick up the compressed fridge with the compressed elephants,
+  put it in your pocket and take it with you. :-)"
+
+  "And eventually, we want to get the elephants back. Reverse your steps
+  and put both elephants back into the kitchen."
+
+  "Use the commands `gunzip` and `bunzip2`, as well as `tar` with the
+  arguments `-x -f name_of_the_archive.tar` (`-x` means \"extract\")."
+
+  prompt {
+    if file(`"$ROOT/kitchen/elephant"`) &&
+       file(`"$ROOT/kitchen/elephant2"`) {
+      expect("tar xzf fridge.tar.gz; gunzip fridge/elephant.gz;
+              bunzip2 fridge/elephant2.bz2")
+      break
+    }
+  }
+
+}
+
+"Enjoy your meal! When you're ready to complete the lesson, say \"done\"!"
+
+prompt {
+  if ready {
+    expect("echo done")
+    break
+  }
+}

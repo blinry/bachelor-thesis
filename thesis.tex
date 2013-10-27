@@ -1,9 +1,9 @@
-\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,12pt,appendixprefix=true]{scrreprt}
+\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,11pt,appendixprefix=true]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage{inconsolata}
+\usepackage[scaled]{beramono}
 \usepackage[ngerman,english]{babel}
 \usepackage{natbib}
 
@@ -86,9 +86,10 @@
         showstringspaces=false,
         literate={`}{\`}1,
     }
-    \lstnewenvironment{ebnf}{\lstset{language=,frame=tbrl}}{}
-    \lstnewenvironment{nutsh}{\lstset{language=nutsh,xleftmargin=\parindent}}{}
-
+    \lstdefinestyle{ebnfstyle}{language=,frame=tbrl}
+    \lstdefinestyle{nutshstyle}{language=nutsh,xleftmargin=\parindent}
+    \lstnewenvironment{ebnf}{\lstset{style=ebnfstyle}}{}
+    \lstnewenvironment{nutsh}{\lstset{style=nutshstyle}}{}
 
 \titlehead{\sffamily\bfseries\makebox[\textwidth]{TECHNISCHE UNIVERSITÄT CAROLO-WILHELMINA ZU BRAUNSCHWEIG}}
 
@@ -126,11 +127,11 @@ I would like to thank the following people for their support in the creation of 
 
 Werner Struckmann was always there for me and answered every question I had.
 Hendrik Freytag provided the list of questions for the evaluation and made helpful comments regarding style and content.
-Arne Brüsch and Markus Reschke helped making the evaluation a lot of fun and contributed interesting ideas.
+Arne Brüsch and Markus Reschke helped making the evaluation a lot of fun and contributed interesting thoughts.
 Heike Laschin, Moritz Mühlhausen and Leslie Wöhler did some early beta-testing and influenced the style of the tutorial.
 And [some people] did a tremendous job of proof-reading the final document.
 
-Finally, I want to thank the 80 freshman students who bravely participated in the very first evaluation of the \emph{Nut Shell} and gave helpful and encouraging feedback.
+Finally, I want to thank the 80 freshman students who bravely participated in the very first evaluation of the Nut Shell and gave helpful and encouraging feedback.
 
 \subsection*{Colophon}
 
@@ -146,6 +147,14 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
 %\pagenumbering{roman}
 
 \begin{abstract}
+    Inspired by the interaction model of text adventures, the Nut Shell represents a new approach to teach command line interfaces, where the program's output and the tutorial text are interweaved.
+
+    An abstraction layer has been devised that gives the framework uniform access to most of the command line programs used today.
+
+    The domain specifig language \emph{nutsh} has some constructs that support authors to create Nut Shell lessons quickly and easily. The framework has a builtin facility for testing the tutorials for proper functioning.
+
+    The framework has been implemented using well-known and common technologies, making it maintainable and extendable in the future.
+
     (Purpose)
 
     (Design + evaluation methods)
@@ -163,6 +172,8 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
 
 \setcounter{tocdepth}{2}
 \tableofcontents
+\listoffigures
+\listoftables
 
 \chapter{Introduction}
 
@@ -181,7 +192,7 @@ This approach is inspired by text adventures. \Cref{fig:zork} demonstrates one o
     \label{fig:zork}
 \end{figure}
 
-Goal of this thesis is to design, implement and evaluate a framework that allows the creation of tutorials with the described teaching approach. In reference to the term \emph{in a nutshell}, which means “to the point” or “short and sweet”, and because the tutorials have a shell-like user interface, we call this framework the \emph{Nut Shell}.
+Goal of this thesis is to design, implement and evaluate a framework that allows the creation of tutorials with the described teaching approach. In reference to the term \emph{in a nutshell}, which means “to the point” or “short and sweet”, and because the tutorials have a shell-like user interface, we call this framework the Nut Shell.
 
 The framework is designed to support arbitrary command line interfaces, for example system shells (\texttt{bash}, \texttt{zsh}, …) or read-eval-print loops of various programming languages (Ruby, Python, Haskell, …), but can also be used to teach subtopics, for example tools like Git, SVN, or other version control systems, Makefiles, compiler toolchains or the UNIX directory structure.
 
@@ -203,34 +214,25 @@ Furthermore, they do not offer that level of persistence that normal interaction
 
 While they emulate some editing capabilities regarding command-line editing, to use comfort functions like accessing the command history or using tab-completion is impossible.
 
-The \emph{Nut Shell} will address all of these shortcomings.
+The Nut Shell will address all of these shortcomings.
 
-\section{Overview}
+\section{Overview and Organization}
 
 %To allow fast creation of tutorials, we designed a domain specific language tailored to the needs of the tutorial's author.
 
 %The main research question of this thesis is whether this approach is in some way "better" than text tutorials.
 
-This thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}. The structure of this thesis follows a bottom-up fashion:
+This thesis covers design, implementation, application and evaluation of the Nut Shell. The structure of this thesis follows a bottom-up fashion:
 
-In \cref{sec:preliminaries}, we introduce and define some of the framework's central topics and terms.
+\Cref{sec:preliminaries} introduces and defines some of the framework's central topics and terms: \emph{Command line interfaces}, \emph{Terminals}, and related technologies.
 
-At the lowest level, the \emph{Nut Shell} employs a wrapper around a command line process. This wrapper needs to be able to adapt to many different command line interfaces---\cref{sec:cli} describes how this abstraction is achieved.
+\Cref{sec:cli} describes the abstraction layer that communicates with the command line process at the core of each Nut Shell tutorial. It explains and demonstrates techniques for adapting to many different command line interfaces and names the requirements the CLIs need to fulfill.
 
-%Design-wise, the framework consists of three layers:
+\Cref{sec:lang} specifies details of the domain specific language \emph{nutsh}, which builds upon the abstraction layer to allows simple, fast creation of new Nut Shell tutorials. It describes syntax and semantics, gives examples and explains how the language can be interpreted and tested.
 
-%- A lowlevel layer that abstracts the target command line interface to a common API.
+\Cref{sec:evaluation} describes application and evaluation of the Nut Shell in an eight-day study with about 120 participants, that compared the new teaching approach with tutorials based on static text, and tried to find out whether the former offers any benefits.
 
-%- The highest layer parses and interprets the nutsh files and recudes them to API calls of the lower layer.
-
-%(Diagram: Layers)
-
-
-To find out whether this teaching approach has benefits compared to tutorials based on static text, the framework was applied and evaluated in an eight-day study with about 120 participants, this is described in \cref{sec:evaluation}.
-
-(lang)
-
-The framework was implemented in Go, we give implementation details follow in \cref{sec:implementation}.
+\Cref{sec:implementation} provides an overview of the Nut Shell's implementation and describes usage and installation.
 
 \Cref{sec:nutshexample} on \cpageref{sec:nutshexample} shows an example session of a bash tutorial created with the \emph{Nuth Shell}. It might be beneficial for the reader to look at this example before continuing to read.
 
@@ -314,14 +316,14 @@ To avoid having to implement these functions themselves, many many (quot) progra
     \caption{Readline key combinations}
 \end{table}
 
-%The \emph{Nut Shell} lets through the command line's output unchanged, and will only add annotations.
+%The Nut Shell lets through the command line's output unchanged, and will only add annotations.
 
 \chapter{Parsing the Command Line}
 \label{sec:cli}
 
 This chapter describes the construction of the framework's lowest-level component, the \emph{command line parser}, which wraps around the command line process that is to be taught, and watches and modifies its input and output to seperate the different parts of the command line interaction. This creates a layer of abstraction that enables the framework to treat all supported CLIs identically.
 
-In this thesis, we treat the targeted command line process as a black box having input and output streams of Unicode characters. To enable the \emph{Nut Shell} to check conditions on the user's interaction, it needs to parse the output accordingly. The interesting parts in this context are the following three, which correspond to the phases described in \cref{sec:cli}:
+In this thesis, we treat the targeted command line process as a black box having input and output streams of Unicode characters. To enable the Nut Shell to check conditions on the user's interaction, it needs to parse the output accordingly. The interesting parts in this context are the following three, which correspond to the phases described in \cref{sec:cli}:
 
 \begin{enumerate}
     \item Which prompt is displayed to the user?
@@ -334,7 +336,7 @@ The main idea here is to use special \emph{markers}, unique character sequences 
 \section{Targets}
 \label{sec:targets}
 
-The \emph{Nut Shell} is designed to support many different command line interfaces. Examples of command line interfaces are bash, irb, python, ghci, … When we talk about one of these programs, we call it the \emph{Nut Shell}'s current \emph{target}.
+The Nut Shell is designed to support many different command line interfaces. Examples of command line interfaces are bash, irb, python, ghci, … When we talk about one of these programs, we call it the Nut Shell's current \emph{target}.
 
 For the following mechanisms to work, a command line program needs to have these features:
 
@@ -354,7 +356,7 @@ All of the command line programs mentioned above have those features and thus ca
 
 \section{Recognizing the prompt}
 
-The prompt is the easiest component to recognize. As the prompt of the target process can be changed (by definition, see the previous section), the \emph{Nut Shell} configures the prompt to start and end with a marker. In the output, the prompt can now be identified nonambigiously.
+The prompt is the easiest component to recognize. As the prompt of the target process can be changed (by definition, see the previous section), the Nut Shell configures the prompt to start and end with a marker. In the output, the prompt can now be identified nonambigiously.
 
 This approach has a downside: If the user tries to change the prompt himself, the system will break. To avoid this, ?
 
@@ -469,8 +471,9 @@ CommandOutput = { NonMarkerCharacter }
 (example)
 
 \chapter{The \emph{nutsh} Language}
+\label{sec:lang}
 
-To enable authors to create \emph{Nut Shell} tutorials quickly, we created a new \emph{domain-specific programming language} (\textsc{DSL}). This language is called \emph{nutsh}, a contraction of “Nut Shell”, which also serves as the filename extension.
+To enable authors to create Nut Shell tutorials quickly, we created a new \emph{domain-specific programming language} (\textsc{DSL}). This language is called \emph{nutsh}, a contraction of “Nut Shell”, which also serves as the filename extension.
 
 Files written in the \emph{nutsh} language represent “lessons”, self-contained teaching units.
 
@@ -747,15 +750,23 @@ A \emph{nutsh} file consists of several of function definitions and other \textt
 Lesson = { Definition | Line } .
 \end{ebnf}
 
-\section{Interpreting}
+\section{Parsing}
 
-After parsing, we have a \emph{syntax tree} representation of the lesson. The interpreter can now travel through the tree and do its thing!
+\emph{nutsh} uses a standard YACC parser, which is described in more detail in \cref{sec:implementation}. The parser creates a \emph{syntax tree} whose nodes have a string value and zero or more child nodes. For leaf nodes, the string value represents the lexical value, for inner nodes, it represents the node's type.
 
-When a function definition is encountered, 
+\section{Interpretation}
+
+A node's values can always be calculated from its children's values. We call this a \emph{synthesized attribute}. As all attributes can be synthesized, \emph{nutsh}'s gramar is said to be \emph{S-attributed}. This makes an evaluation of the syntax tree especially easy, as the interpreter can now travel through the tree in a bottom-up manner.
+
+While traversing through the syntax tree, the interpreter keeps track of the encountered nesting statements.
+
+When a function definition is encountered, the definition node along with its children is added to the symbol table.
+
+When a \texttt{prompt} node is encountered, the \emph{command line parser} is used to prompt the user for a command. The command and it's output are saved so they can be accessed when calling the \texttt{input} and \texttt{output} functions. Then the 
+
+(ref: dragon)
 
 (State)
-
-(Function stack)
 
 \section{Automated testing}
 
@@ -791,7 +802,7 @@ By convention, when a prompt is encountered whose expects are all reached, the f
 \chapter{Application and Evaluation}
 \label{sec:evaluation}
 
-To find out whether the teaching method provided by the \emph{Nut Shell} has any advantages compared to traditional teaching methods, we created an example tutorial and conducted a two-week course with a subsequent survey.
+To find out whether the teaching method provided by the Nut Shell has any advantages compared to traditional teaching methods, we created an example tutorial and conducted a two-week course with a subsequent survey.
 
 \section{Setting}
 
@@ -807,7 +818,7 @@ The newly created \textit{Nut Shell} tutorial kept these topics and their order.
 
 \section{Style}
 
-The basic structure in the \emph{Nut Shell} tutorial when introducing new concepts is the following: First, a general problem is stated. The method or tool for solving these class of problems is presented using a simple example, in which the user is guided exactly what to do. After that follow several problems of increasing difficulty which the user has to solve on his own. Finally, some advanced concepts and ideas are mentioned, and the user is given some free room to experiment with those. A clear signal is communicated that the user can use to continue.
+The basic structure in the Nut Shell tutorial when introducing new concepts is the following: First, a general problem is stated. The method or tool for solving these class of problems is presented using a simple example, in which the user is guided exactly what to do. After that follow several problems of increasing difficulty which the user has to solve on his own. Finally, some advanced concepts and ideas are mentioned, and the user is given some free room to experiment with those. A clear signal is communicated that the user can use to continue.
 
 Often, goals are stated but how to achieve it is up to the user. This has to be realized by testing against \texttt{output} and \texttt{run()} statements. At several occasions, the user can choose among several paths to continue or can determine in which order to learn about several topics. These structures are supposed to give the user a feeling of autonomy and control.
 
@@ -819,7 +830,7 @@ After the sixth day, an online survey was conducted whithin both groups. In the 
 
 \begin{itemize}
     \item What is your course of studies?
-    \item Did you use the \emph{Nut Shell} or the paper exercises?
+    \item Did you use the Nut Shell or the paper exercises?
     \item On a range from 1 (not at all) to 10 (entirely), how much do you agree to the following statements?
         \begin{enumerate}
             \item I had previous knowledge about the command line.
@@ -833,7 +844,7 @@ After the sixth day, an online survey was conducted whithin both groups. In the 
     \item How many times did you have to ask for help per day?
 \end{itemize}
 
-The second part of the survey was a quiz with 11 questions about different topics of the tutorial, in an attempt to quantify how much the participants learned. The following questions were provided by a person who was uninvolved with and unaware of the content of the \emph{Nut Shell} lessons to avoid a bias which could have led to asking questions we knew the Nut Shell explained well. For evaluation, each answer was marked with either 0 points (no or wrong answer), 0.5 points (correct parts), or 1 points (complete and correct answer).
+The second part of the survey was a test with 11 questions about different topics of the tutorial, in an attempt to quantify how much the participants learned. The following questions were provided by a person who was uninvolved with and unaware of the content of the Nut Shell lessons to avoid a bias which could have led to asking questions we knew the Nut Shell explained well. For evaluation, each answer was marked with either 0 points (no or wrong answer), 0.5 points (correct parts), or 1 points (complete and correct answer).
 
 \begin{enumerate}
     \item How do you create the directory \texttt{abc.txt}?
@@ -852,14 +863,14 @@ The second part of the survey was a quiz with 11 questions about different topic
 
 \section{Results}
 
-For the Survey's first part, there were 64 answers in total. 52 of the participants specified they had used the \emph{Nut Shell}, 11 of them had used the exercise sheets. \Cref{fig:general} juxtaposes the answers to the general questions of both groups in the form of a box plot: The circle marks the median of the answers to each question, the box contains 50\% of the answers, the whiskers reach from the minimum to the maximum answer. According to the participants, the \emph{Nut Shell} users had significantly more fun and had the impression of having learned more than the paper exersice users. While there is a slight evidence that the \emph{Nut Shell} users found the course easier, had less time, and thought of the topics to be more relevant, these differences are not statistically meaningful.
+For the Survey's first part, there were 64 answers in total. 52 of the participants specified they had used the Nut Shell, 11 of them had used the exercise sheets. \Cref{fig:general} juxtaposes the answers to the general questions of both groups in the form of a box plot: The circle marks the median of the answers to each question, the box contains 50\% of the answers, the whiskers reach from the minimum to the maximum answer. According to the participants, the Nut Shell users had significantly more fun and had the impression of having learned more than the paper exersice users. While there is a slight evidence that the Nut Shell users found the course easier, had less time, and thought of the topics to be more relevant, these differences are not statistically meaningful.
 
 \begin{figure}[p]
     \begin{tikzpicture}[trim axis left, trim axis right]
         \begin{axis}[
                 boxplotcompare style,
                 ytick={1,2,3,4,5,6,7},
-                yticklabels={Piror knowledge, Fun, Learned a lot, Too hard, Enough time, Relevant, Recommend},
+                yticklabels={Prior knowledge, Fun, Learned a lot, Too hard, Enough time, Relevant, Recommend},
                 boxplot,
                 y dir=reverse,
                 height=\textheight,
@@ -1036,7 +1047,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
     \label{fig:general}
 \end{figure}
 
-\Cref{fig:help} shows the answers to the question regarding how many times per day the participant needed support from a student assistant. Clearly, the \emph{Nut Shell} users needed less help.
+\Cref{fig:help} shows the answers to the question regarding how many times per day the participant needed support from a student assistant. Clearly, the Nut Shell users needed less help.
 
 \begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1088,7 +1099,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
     \label{fig:help}
 \end{figure}
 
-\Cref{fig:quiz} shows the distribution of quiz scores. The hightest achievable score was $12$. The exercise sheet group achieved a slightly higher score.
+\Cref{fig:test} shows the distribution of test scores. The hightest achievable score was $12$. The exercise sheet group achieved a slightly higher score.
 
 \begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1136,11 +1147,11 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
         \end{axis}
     \end{tikzpicture}
     \centering
-    \caption{Points that the participants got in the quiz}
-    \label{fig:quiz}
+    \caption{Points that the participants got in the test}
+    \label{fig:test}
 \end{figure}
 
-\Cref{fig:meta} shows the answers to the \emph{Nut Shell} related questions. The initial explanations as well as the exercises received high scores, with a median of $9$, the tips for solving the exercises received a median score of $7$. Over half of the participants would like to use the \emph{Nut Shell} again for a future tutorial.
+\Cref{fig:meta} shows the answers to the Nut Shell related questions. The initial explanations as well as the exercises received high scores, with a median of $9$, the tips for solving the exercises received a median score of $7$. Over half of the participants would like to use the Nut Shell again for a future tutorial.
 
 \begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1206,7 +1217,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
         \end{axis}
     \end{tikzpicture}
     \centering
-    \caption{Answers to \emph{Nut Shell} related questions}
+    \caption{Answers to Nut Shell related questions}
     \label{fig:meta}
 \end{figure}
 
@@ -1265,21 +1276,19 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
 
 \section{Discussion}
 
-The small number of participants that were left after day 8 a problem. The results are warped, as just those participants who had fun and learned something stayed, which explains why the scores are relatively close to each other.
+The small number of participants in the exercise sheet group that were left after day 8 were a problem. The results are likely to be warped, as just those participants who had fun and learned something stayed, which explains why the scores are relatively close to each other.
 
-That is why we evaluated the loss of participants over time. In this case, 63.8\% of the \emph{Nut Shell} users stayed until the last day. Of the exercise sheet users, only 24.4\% stayed.
+That is why only the evaluation of the numbers of participants over time is really meaningful. In this case, 63.8\% of the Nut Shell users stayed until the last day. Of the exercise sheet users, only 24.4\% stayed. According to the course's organizers and former assistants, this last number is indeed typical and representative for the course. This could hint that the Nut Shell lesson motivated the students more to attend to the course. For whichever reason this happened: From a lecturer's perspective, this result of keeping the students motivated to attend, is highly gratifying.
 
-(hiwis sparen)
+Another positive result is the lowered demand for external help the Nut Shell users had. In this case, the Nut Shell users on average asked half the number of questions compared to the exercise sheet group. On the one hand, this is pleasing for the students theirselves, as they can learn more independently---for example, from home, where no external help is available. On the other hand, the number of required student assistants can be lowered, leading to lowered costs for the university while apparently maintaining at least the same quality of education.
 
-(self empowering)
+\chapter{Conclusion and Future Work}
 
-\chapter{Conclusions}
+While the evaluation showed improvements regarding fun and self-assessed learning success compared to static text exercises, they were quite insignificant. In the subsequent test, the Nut Shell users even reached a lower average score. Both results are unreliable due to the large decline of participants in the control group. There is evidence, however, that the Nut Shell kept the students more motivated and allowed then to work more autonomously.
 
-(Discussion of survey results)
+During the evaluation, the student's general feedback was very positive. Some were eager to install Linux on their own computers so they could continue to use the tutorial.
 
-\chapter{Limitations and Future Directions}
-
-Right now, typing errors can be catched by defining some \texttt{command} checks by hand. The \texttt{expect}-Statements could be used to automate this detection of typing errors by applying (algorithm).
+Of course, there is a lot of potential for further development. Right now, typing errors can be catched by defining some \texttt{command} checks by hand. The \texttt{expect}-Statements could be used to automate this detection of typing errors by applying (algorithm).
 
 While the syntax of the \texttt{prompt} makes the semantic of the \emph{nutsh} files quite clear, in practical use it seems cumbersome, as it is repeated so often. The syntax could be simplified here so that blocks of \texttt{if} clauses imply a \texttt{prompt} block around it.
 
@@ -1287,11 +1296,12 @@ Right now, the lessons of a tutorial form a linear order. It would make sense to
 
 %goal-oriented syntax?
 
+
 The users feedback while using the tutorial can be very useful to improve it. This feedback collection could be automated by recording the user's interaction and tracking their progress over time. For example, when users do not reach new \texttt{prompt} statements for a longer time, or enter disproportionately many commands in one \texttt{prompt} loop this could be an indication that this section is too hard and should get more hints. The wrong commands can also be automatically collected, analyzed, and be presented to the author so that he can create appropriate hints in the lesson.
 
-In the evaluation, it was a problem when the students entered many commands and had to scroll the terminal output up to read the tutorial text. The \emph{Nut Shell} should provide a special command to repeat the last few tutorial lines.
+In the evaluation, it was a problem when the students entered many commands and had to scroll the terminal output up to read the tutorial text. The Nut Shell should provide a special command to repeat the last few tutorial lines.
 
-During the preparatory course, a student told us he would like to use the \emph{Nut Shell} to teach the command line to pupils at his old school. I plan to extend the Nut Shell further and release it under an Open Source license to allow others to benefit from it.
+It's likely that the Nut Shell will be used for the upcoming preparatory courses as well. Another institute has already shown interest to use the Nut Shell for a more in-depth course on the version control software Git. During the preparatory course, a student told us he would like to use the Nut Shell to teach the command line to pupils at his old school. I plan to continue development on the Nut Shell and release it under an free license to allow others to benefit from it.
 
 \cleardoublepage
 \appendix
@@ -1299,7 +1309,9 @@ During the preparatory course, a student told us he would like to use the \emph{
 \chapter{Example Lesson}
 \label{sec:nutshexample}
 
-(nutsh source code)
+This is an acutal lesson from the preparatory course. The students already lerned how to move and display files.
+
+\lstinputlisting[language=nutsh,frame=tbrl]{compress.nutsh}
 
 (Execution output)
 
@@ -1317,7 +1329,7 @@ To conduct the survey, we used the open source software \emph{Limesurvey}.
 
 \section{Parsing}
 
-To parse the token stream into a parse tree, we used \textsc{YACC}. \textsc{YACC} is a $LALR(1)$ parser generator that takes a list of token types, a grammar description and a operator precedence declaration and generates a method that takes tokens from the lexer and parses them. Go comes with its own YACC implementation (ref).
+To parse the token stream into a parse tree, we used \textsc{YACC}. \textsc{YACC} is a $LALR(1)$ parser generator that takes a list of token types, a grammar description and a operator precedence declaration and generates a function that takes tokens from the lexer and parses them. Go comes with its own YACC implementation (ref).
 
 (ref: http://dinosaur.compilertools.net/yacc/)
 
@@ -1331,7 +1343,7 @@ To parse the token stream into a parse tree, we used \textsc{YACC}. \textsc{YACC
 
 (Builtin functions)
 
-\section{Obtaining and using the \emph{Nut Shell}}
+\section{Obtaining and using the Nut Shell}
 
 homepage, usage instructions
 
