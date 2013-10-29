@@ -267,7 +267,7 @@ Commonly, interaction with a \textsc{CLI} consists of three phases:
     \item The program executes the command and displays a response. Sometimes, the execution is \emph{interactive} and requires further input. After the command has finished, the first phase starts again.
 \end{enumerate}
 
-In this thesis, the examples will use IRB, the \emph{Interactive Ruby Shell}. Ruby is an object-oriented scripting language and, at the basic level, can be used to evaluate arithmetic expressions. \Cref{fig:irb} shows a few iterations of the three phases mentioned above. The characters \texttt{>\->} constitute the prompt, the following characters (set in a bold typeface) are commands the user typed, and the subsequent lines are the program's output.
+In this thesis, the examples will use IRB, the \emph{Interactive Ruby Shell}. Ruby is an object-oriented scripting language and, at the basic level, can be used to evaluate arithmetic expressions. \Cref{fig:irb} shows a few iterations of the three phases mentioned above. The characters \texttt{>\->} constitute the prompt; the following characters, set in a bold typeface, are commands the user typed; and the subsequent lines are the program's output.
 
 \begin{figure}[tb]
     \begin{lstlisting}[escapechar=@,frame=shadowbox]
@@ -313,7 +313,7 @@ To avoid having to implement these functions themselves, many command line progr
 \chapter{The Command Line Tokenizer}
 \label{sec:cliparser}
 
-This chapter describes the construction of the framework's lowest-level component, the \emph{command line tokenizer}, which wraps around the command line process that is to be taught. It watches and modifies its input and output to seperate the different parts of the command line interaction. This creates a layer of abstraction that enables the framework to treat all supported CLIs identically.
+The \emph{command line tokenizer} is the framework's lowest-level component, which wraps around the command line process that is to be taught. It watches and modifies its input and output to seperate the different parts of the command line interaction. This creates a layer of abstraction that enables the framework to treat all supported CLIs identically.
 
 In this thesis, the targeted command line process is treated as a black box having input and output streams of Unicode characters. To enable the Nut Shell to check conditions on the user's interaction, it needs to parse the output accordingly.
 
@@ -336,9 +336,9 @@ Second, it can run commands itself in the background, while having access to the
 
 The Nut Shell is designed to support many different command line interfaces. Examples of command line programs can be found in \cref{sec:cliexamples}. When we talk about one of these programs, we call it the Nut Shell's current \emph{target}.
 
-For the following mechanisms to work, a command line program needs to have these features:
+For the following mechanisms to work, a command line program needs to have the following two features:
 
-\begin{itemize}
+\begin{enumerate}
     \item Freely customizable prompts.
     \item Readline-like keybindings. Mandatory are the following three key combinations:
         \begin{itemize}
@@ -348,7 +348,7 @@ For the following mechanisms to work, a command line program needs to have these
             
             \item \keys{\ctrl+Y} has to re-insert the content of this buffer
         \end{itemize}
-\end{itemize}
+\end{enumerate}
 
 All command line programs mentioned in \cref{sec:cliexamples} have those features and thus can be used as \emph{targets}.
 
@@ -361,13 +361,11 @@ All command line programs mentioned in \cref{sec:cliexamples} have those feature
     \label{fig:tokenizer}
 \end{figure}
 
-\Cref{fig:tokenizer} \todo{Proper diagram} demonstrates the architecture of the tokenizer. At the bottom there is the command line process having both input and output streams of Unicode characters. The output is read by the \emph{tokenizer}, which splits it into tokens of the types “prompt”, “command”, or “output”. In addition to that, the \emph{tokenizer} sends characters to the caller that originate from interactive programs and need to be displayed before the token is complete. The high-level component \emph{CLI} then check conditions on the tokens.
+\Cref{fig:tokenizer} \todo{Proper diagram} demonstrates the architecture of the tokenizer. The command line process at the bottom has both input and output streams of Unicode characters. The output is read by the \emph{tokenizer}, which splits it into tokens of the types “prompt”, “command”, or “output”. In addition to that, the \emph{tokenizer} sends characters to the caller that originate from interactive programs and need to be displayed before the token is complete. The high-level component \emph{CLI} then check conditions on the tokens.
 
 On the input side, the user's input is modified by \emph{filterInput} in the manner described in \cref{sec:reccmd}. The result is then given to the process as input. The \emph{filterInput} component also filters the commands given by the high-level \emph{CLI} component in the same way.
 
-The EBNF grammar shown in this chapter describes how the tokenizer watching the output of the command line process works.
-
-As markers, the Nut Shell simply
+The EBNF grammar shown in the following sections describes how the tokenizer watching the output of the command line process works.
 
 The output of a process as it is used in the framework consists of three segments: The prompt (with markers, see next section), the composing of the command (which can include escape sequences for editing, or can consist of several lines), and the command's output. These segments can be repeated. The command output simply consists of non marker characters:
 
@@ -830,7 +828,7 @@ The second part of the survey was a test with 11 questions about different topic
     \item Output all lines of the file \texttt{abc.txt} that contain the Text "Hallo".
     \item What is the variable \texttt{PS1} used for?
     \item What do you use \texttt{>} and \texttt{>>} for and how do they differ?
-    \item How dou you archive and compress all files with the ending "123" in the current directory?
+    \item How do you archive and compress all files with the ending "123" in the current directory?
     \item What is the file \texttt{~/.bashrc} used for?
     \item You don't want to type \texttt{ls -alR} all the time, but create a short hand form. Which possibilities do you have and what is the corresponding command?
     \item What are pipes used for and how do you use them? Write an example command.
@@ -1038,7 +1036,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
         \begin{axis}[
                 boxplotcompare style,
                 ytick={1},
-                yticklabels={help/day},
+                yticklabels={Help/day},
                 boxplot,
                 y dir=reverse,
                 height=0.32\textwidth,
@@ -1264,11 +1262,11 @@ The small number of participants in the exercise sheet group that were left afte
 
 That is why only the evaluation of the numbers of participants over time is really meaningful. In this case, 63.8\% of the Nut Shell users stayed until the last day. Of the exercise sheet users, only 24.4\% stayed. According to the course's organizers and former assistants, this last number is indeed typical and representative for the course. This could hint that the Nut Shell lesson motivated the students more to attend to the course. For whichever reason this happened: From a lecturer's perspective, this result of keeping the students motivated to attend, is highly gratifying.
 
-Another positive result is the lowered demand for external help the Nut Shell users had. In this case, the Nut Shell users on average asked half the number of questions compared to the exercise sheet group. On the one hand, this is pleasing for the students theirselves, as they can learn more independently---for example, from home, where no external help is available. On the other hand, the number of required student assistants can be lowered, leading to lowered costs for the university while apparently maintaining at least the same quality of education.
+Another positive result is the lowered demand for external help the Nut Shell users had. In this case, the Nut Shell users on average asked half the number of questions compared to the exercise sheet group. On the one hand, this is pleasing for the students themselves, as they can learn more independently---for example, from home, where no external help is available. On the other hand, the number of required student assistants can be lowered, leading to lowered costs for the university while apparently maintaining at least the same quality of education.
 
 \chapter{Conclusion and Future Work}
 
-While the evaluation showed improvements regarding fun and self-assessed learning success compared to static text exercises, they were quite insignificant. In the subsequent test, the Nut Shell users even reached a lower average score. Both results are unreliable due to the large decline of participants in the control group. There is evidence, however, that the Nut Shell kept the students more motivated and allowed then to work more autonomously.
+While the evaluation showed improvements regarding fun and self-assessed learning success compared to static text exercises, they were quite insignificant. In the subsequent test, the Nut Shell users even reached a lower average score. Both results are unreliable due to the large decline of participants in the control group. There is evidence, however, that the Nut Shell kept the students more motivated and allowed them to work more autonomously.
 
 During the evaluation, the student's general feedback was very positive. Some were eager to install Linux on their own computers so they could continue to use the tutorial.
 
@@ -1280,12 +1278,11 @@ Right now, the lessons of a tutorial form a linear order. It would make sense to
 
 %goal-oriented syntax?
 
-
 The users feedback while using the tutorial can be very useful to improve it. This feedback collection could be automated by recording the user's interaction and tracking their progress over time. For example, when users do not reach new \texttt{prompt} statements for a longer time, or enter disproportionately many commands in one \texttt{prompt} loop this could be an indication that this section is too hard and should get more hints. The wrong commands can also be automatically collected, analyzed, and be presented to the author so that he can create appropriate hints in the lesson.
 
 In the evaluation, it was a problem when the students entered many commands and had to scroll the terminal output up to read the tutorial text. The Nut Shell should provide a special command to repeat the last few tutorial lines.
 
-It's likely that the Nut Shell will be used for the upcoming preparatory courses as well. Another institute has already shown interest to use the Nut Shell for a more in-depth course on the version control software Git. During the preparatory course, a student told us he would like to use the Nut Shell to teach the command line to pupils at his old school. Development on the Nut Shell will continue and it will be release under an free license to allow others to benefit from it.
+It's likely that the Nut Shell will be used for the upcoming preparatory courses as well. Another institute has already shown interest to use the Nut Shell for a more in-depth course on the version control software Git. During the preparatory course, a student told us he would like to use the Nut Shell to teach the command line to pupils at his old school. Development on the Nut Shell will continue and it will be released under an free license to allow others to benefit from it.
 
 \cleardoublepage
 \appendix
