@@ -1,4 +1,3 @@
-lesson_name("Compressing files - tar, gzip, bzip2")
 make_home
 run(`rm -f "$ROOT/kitchen/elephant*"`)
 run(`rm -f "$ROOT/kitchen/fridge.tar"`)
