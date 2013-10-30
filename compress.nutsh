@@ -1,8 +1,4 @@
 make_home
-run(`rm -f "$ROOT/kitchen/elephant*"`)
-run(`rm -f "$ROOT/kitchen/fridge.tar"`)
-run(`rm -rf "$ROOT/kitchen/fridge"`)
-run(`mkdir "$ROOT/kitchen/fridge"`)
 
 // create a file that contains 10 MiB of ascending numbers
 run(`seq 1 2000000 | tr -d '\n' | head -c $((1024*1024*10)) >

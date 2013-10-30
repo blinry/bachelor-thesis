@@ -1,36 +1,34 @@
-def go_home {
+// create a folder as an environment for the lesson
+def make_home {
     run(`ROOT="$HOME"/.nutsh`)
     run(`mkdir -p "$ROOT"`)
-    run(`cd "$ROOT"`)
-}
-
-def make_home {
-    go_home
     run(`cd "$ROOT"`)
     run(`mkdir -p kitchen bedroom livingroom`)
 }
 
+// return the exit code of the last command
 def exit_code {
     return(run("echo $?"))
 }
 
-def runs(cmd) {
+// check a conditional expression using bash's "[[ ]]" syntax
+def test(condition) {
     run(cmd)
+    run("[[ "+condition+" ]]")
     return(exit_code == "0")
 }
 
-def test(condition) {
-    return(runs("[[ "+condition+" ]]"))
-}
-
+// check whether the directory 'd' exists
 def dir(d) {
     return(test("-d \""+d+"\""))
 }
 
+// check whether the file 'f' exists
 def file(f) {
     return(test("-f \""+f+"\""))
 }
 
+// was the last command "echo done" or "echo ready"?
 def done {
     return(command =~ `echo\s+(done|ready)`)
 }
