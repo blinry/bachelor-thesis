@@ -70,7 +70,7 @@ stop_elephant(""), stop_elephant("2") {
   "That sounds much better."
 
   "Because that went so well, we've delivered a second elephant to the
-  hallway. Get it into the kitchen and and compress it, this time with
+  hallway. Get it into the kitchen and compress it, this time with
   `bzip2`. How large is the file this time?"
 
   run(`seq 1 2000000 | tr -d '\n' | head -c $((1024*1024*10)) >
