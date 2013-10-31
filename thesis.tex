@@ -9,6 +9,9 @@
 \usepackage[style=numeric]{biblatex}
     \addbibresource{bibliography.bib}
 
+\usepackage{xcolor}
+    \definecolor{medium-blue}{rgb}{0,0,0.5}
+
 %\setcitestyle{super,square}
 
 \usepackage{blindtext}
@@ -63,8 +66,12 @@
     \newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
     \newcommand{\cursor}{\invert{ }}
     \newcommand{\escape}[1]{\textasciicircum #1}
-\usepackage[linktoc=page,hidelinks]{hyperref}
-\usepackage{cleveref}
+\usepackage{hyperref}
+    \hypersetup{
+        colorlinks, linkcolor={medium-blue},
+        citecolor={medium-blue}, urlcolor={medium-blue}
+    }
+\usepackage[nameinlink]{cleveref}
 \usepackage[os=win]{menukeys}
     \renewmenumacro{\keys}[+]{shadowedroundedkeys}
 \usepackage{syntax}
@@ -399,7 +406,7 @@ All command line programs mentioned in \cref{sec:cliexamples} have those feature
     \label{fig:architecture}
 \end{figure}
 
-\Cref{fig:tokenizer} demonstrates the architecture of the tokenizer. The command line process at the bottom has both input and output streams of Unicode characters. The output is read by the \emph{tokenizer}, which splits it into tokens of the types “prompt”, “command”, or “output”. In addition to that, the \emph{tokenizer} sends characters to the program logic that originate from interactive programs and need to be displayed before the token is complete. The logic component can then check conditions on the tokens and send appropriate text to the terminal.
+\Cref{fig:architecture} demonstrates the architecture of the tokenizer. The command line process at the bottom has both input and output streams of Unicode characters. The output is read by the \emph{tokenizer}, which splits it into tokens of the types “prompt”, “command”, or “output”. In addition to that, the \emph{tokenizer} sends characters to the program logic that originate from interactive programs and need to be displayed before the token is complete. The logic component can then check conditions on the tokens and send appropriate text to the terminal.
 
 On the input side, the user's input is modified by the \emph{input filter} in the manner described in \cref{sec:reccmd}. The result is then given to the process as standard input. The \emph{input filter} also filters the commands given by the logic component in the same way, this is used for commands that check conditions in the process.
 
@@ -463,7 +470,7 @@ Because \keys{\ctrl+Y} repeats the whole command as the user intended to run it,
     \caption{Example of the command marker technique.}
     \label{tab:cmdmarking}
     \begin{tabular}{r|l|l|l|l}
-        Line & Keystrokes & Input & Output & Screen content \\
+        & Keystrokes & Input & Output & Screen content \\
         \hline
         1 & & & \texttt{>>␣} & \texttt{>>␣\cursor} \\
         2 & \keys{1} \keys{-} \keys{1} & \texttt{1-1} & \texttt{1-1} & \texttt{>>␣1-1\cursor} \\
@@ -485,9 +492,11 @@ Because \keys{\ctrl+Y} repeats the whole command as the user intended to run it,
     \end{tabular}
 \end{table}
 
-\Cref{tab:cmdmarking} demonstrates the technique. The first column lists the user's keystrokes, the second one contains the characters sent to the process, the third one contains the output of the process, and the final one shows the current content of the screen. The gray rectangle indicates the cursor position. In the example, the user enters \texttt{1-1}, and then replaces the \texttt{-} character with a \texttt{+} using arrow keys and \emph{backspace}. From the output up to line 8, it is hard to recognize the actual command \texttt{1+1} (which is displayed on the screen). \todo{Explain the escape codes in the table.}
+\Cref{tab:cmdmarking} demonstrates the technique. The first column lists the user's keystrokes, the second one contains the characters sent to the process, the third one contains the output of the process, and the final one shows the current content of the screen. The gray rectangle indicates the cursor position. In the example, the program first writes a prompt. The user then enters \texttt{1-1}, and then replaces the \texttt{-} character with a \texttt{+} using arrow keys and \emph{backspace}. The first three characters are routed from the program's input to its output literally. In line 3, the left arrow key send the escape sequence \texttt{\escape{[}[D} to the program, which means “move the cursor backwards”. In the output, this is transformed to \texttt{\escape{H}}, a \emph{backspace} character, which has the same effect in the terminal. In line 4, the \emph{backspace} key is translated into \texttt{\escape{H}} (move the cursor backwards) and \texttt{\escape{[}[1P} (delete one character). The insertion of the \texttt{+} character has the following effect: The \texttt{+} and the text after the cursor is rewritten, and the cursor is then moved back to its position inside of the command using \texttt{\escape{H}}.
 
-When the user presses \emph{return}, the described sequence is sent to the process, and when reading the “Output” column, the correct command \texttt{1+1} appears neatly between the two markers. After the first marker, there are some deletion characters in the output (they depend on the concrete command line program, but come from a fixed character set, see \cref{sec:esc}), and before the second marker there is always a space character. By removing these, the exact command the user wanted to enter is left.
+From the content of the “Output” column up to line 9, it is hard to recognize the actual command \texttt{1+1} (which is displayed on the screen). When the user presses \emph{return}, the described sequence is sent to the process. In line 9, the cursor is moved to the end of the line using \texttt{\escape{[}[C} (move the cursor forward). In line 11, the command is deleted by moving the cursor to the beginning of the line with \texttt{\escape{H}} and clearing the terminal's current line to the right with \texttt{\escape{[}[K}. After that, no new escape sequences appear: The marker is inserted and deleted, the command is repeated, another marker is inserted and deleted, and the space character is removed.
+
+When reading the “Output” column, the correct command \texttt{1+1} now appears neatly between the two markers. After the first marker follow some deletion characters in the output (they depend on the concrete command line program, but come from a fixed character set, see \cref{sec:esc}). And after the command there is always a space character in the output. By removing both, the exact command the user wanted to enter is extracted.
 
 In general, for the tokenizer, the composing sequence has two phases: In the first one, the actual command line composing takes place. In the second one, the current line is deleted and reprinted as described above. The interesting part here is \texttt{Command}:
 
@@ -780,7 +789,7 @@ While traversing the syntax tree, the interpreter keeps track of the encountered
 %(State)
 
 \section{Automated testing}
-
+\label{sec:testing}
 
 As the author of a tutorial, one wants to verify that all the lessons work correctly. The framework provides a function for automated testing of correctness, so one does not have to enter all the required commands by hand.
 
@@ -812,21 +821,19 @@ By convention, when a prompt is encountered whose expects are all reached, the f
 \section{Implementation}
 \label{sec:implementation}
 
+For installation and usage instructions, refer to \cref{sec:usage}.
+
 \subsection*{Used technologies}
 
-The framework has been implemented in Google Go \cite{google13}, a compiled, statically typed language, which is seen by many as a modern successor to C. This language was a perfect fit as it is very fast and was created with low-level programming in mind. Its standard library offered nearly everything needed to implement the Nut Shell. For emulating a terminal, the small \texttt{pty} package was used. \todo{ref}
+The framework has been implemented in Google Go \cite{google13}, a compiled, statically typed language, which is seen by many as a modern successor to C. This language was a perfect fit for the Nut Shell as it is very fast and was created with low-level programming in mind. Its standard library offered nearly everything needed to implement the Nut Shell. For emulating a terminal, the small \texttt{pty} package\footnote{\url{https://github.com/kr/pty}} was used.
 
-The online survey was conducted using the open source software \emph{Limesurvey}. \todo{ref}
+The online survey was conducted using the open source software \emph{Limesurvey}.\footnote{\url{https://www.limesurvey.org/}}
 
 \subsection*{Parsing}
 
-To parse the token stream into a parse tree, the framework used \textsc{YACC}. \textsc{YACC} is a $LALR(1)$ parser generator that takes a list of token types, a grammar description and a operator precedence declaration and generates a function that takes tokens from the lexer and parses them. Go comes with its own YACC implementation. \todo{ref}
+To parse the token stream into a parse tree, the framework used \textsc{YACC}. \textsc{YACC} is a $LALR(1)$ parser generator that takes a list of token types, a grammar description and a operator precedence declaration and generates a function that takes tokens from the lexer and parses them. Go comes with its own YACC implementation.\footnote{\url{http://golang.org/cmd/yacc/}}
 
 %(ref: http://dinosaur.compilertools.net/yacc/)
-
-\subsection*{Installation and Usage}
-
-\todo{Write}
 
 \chapter{Application and Evaluation}
 \label{sec:evaluation}
@@ -1326,7 +1333,7 @@ While the evaluation showed improvements regarding fun and self-assessed learnin
 
 During the evaluation, the student's general feedback was very positive. Some were eager to install Linux on their own computers so they could continue to use the tutorial.
 
-Of course, there is a lot of potential for further development. Right now, typing errors can be catched by defining some \texttt{command} checks by hand. The \texttt{expect}-Statements could be used to automate this detection of typing errors by measuring the \emph{edit distance} \todo{Reference} between the entered command and the expected commands. When the distance falls below a certain threshold, the correct command could be suggested to the user.
+Of course, there is a lot of potential for further development. Right now, typing errors can be catched by defining some \texttt{command} checks by hand. The \texttt{expect}-Statements could be used to automate this detection of typing errors by measuring the \emph{edit distance}\footnote{For example, the Levenshtein distance, that detects insertions, deletions and substitutions \cite{levenshtein66}.} between the entered command and the expected commands. When the distance falls below a certain threshold, the correct command could be suggested to the user.
 
 While the syntax of the \texttt{prompt} makes the semantic of the \emph{nutsh} files quite clear, in practical use it seems cumbersome, as it is repeated so often. The syntax could be simplified here so that blocks of \texttt{if} clauses imply a \texttt{prompt} block around it.
 
@@ -1397,10 +1404,19 @@ The following lessons were part of the preparatory course:
     \end{enumerate}
 \end{multicols}
 
+\chapter{Installation and Usage}
+\label{sec:usage}
+
+The \texttt{nutsh} program takes two parameters. The second one specifies the tutorial folder. For the first parameter, there are two options: \texttt{run} will start the Nut Shell normally and present a list of lessons to the user to choose from. \texttt{test} will run all lessons in the specified tutorial in the testing mode described in \cref{sec:testing}.
+
+To run the tutorial created for the preparatory course, a Linux distribution is required. Furthermore, the tools used in the tutorial need to be installed: Java, \texttt{pdflatex}, Git, \texttt{make}, an SSH client, a \texttt{locate} implementation, and the GNU coreutils. In case a program is missing, it can be installed at any later time.
+
 \chapter{Table of Terminal Escape Codes}
 \label{sec:esc}
 
-\todo{Write}
+The content of this table is taken from the Technical Reference of \texttt{urxvt} \cite{}, which is a very common modern terminal emulator implementation.
+
+\todo{Write?}
 
 \chapter{Table of Readline Key Bindings}
 \label{sec:keybindings}
