@@ -6,7 +6,6 @@
 \usepackage{slantsc}
 \usepackage[scaled]{beramono}
 \usepackage[ngerman,english]{babel}
-\usepackage{todonotes}
 \usepackage[style=numeric]{biblatex}
     \addbibresource{bibliography.bib}
 
@@ -127,11 +126,8 @@ Advisor: Dr. Werner Struckmann}
     \hskip 1cm \dotfill
 }
 
-%\vspace{2cm}
-
-%Braunschweig, 2013-11-03 \dotfill}
 \lowertitleback{
-\subsection*{Acknowledgements}
+\subsection*{Acknowledgments}
 
 I would like to thank the following people for their support in the creation of this thesis:
 
@@ -141,7 +137,7 @@ Arne Brüsch and Markus Reschke helped making the evaluation a lot of fun and co
 Heike Laschin, Moritz Mühlhausen and Leslie Wöhler did some early beta-testing and influenced the style of the final tutorial.
 [Some people] did a tremendous job of proof-reading the final document.
 My family gave me a great amount of support and motivation.
-And finally, I want to thank the 120 students who bravely participated in the very first evaluation of the Nut Shell and gave helpful and encouraging feedback.
+And finally, I want to thank the 120 students who bravely participated in the first evaluation of the Nut Shell and gave helpful and encouraging feedback.
 
 \subsection*{Colophon}
 
@@ -161,7 +157,7 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
 
     The thesis covers design, implementation, application and evaluation of the \emph{Nut Shell}, a software framework for creating those tutorials.
 
-    An abstraction layer is devised that gives the framework uniform access to the different parts of interaction within arbitrary command line programs, while retaining all their builtin editing features. The framework is compatible with system shells and many interpreted programming languages, but can also be used to teach subtopics, like specific command line tools or concepts.
+    An abstraction layer is devised that gives the framework uniform access to the different parts of interaction within arbitrary command line programs, while retaining all their built-in editing features. The framework is compatible with system shells and many interpreted programming languages, but can also be used to teach subtopics, like specific command line tools or concepts.
 
     The Nut Shell introduces a new domain specific language, that can be used to describe tutorial lessons. The language's syntactic structures are tailored for this purpose and thus allow for fast and easy content creation. A built-in testing facility enables authors to check their tutorials for proper function automatically.
 
@@ -260,12 +256,14 @@ The structure of the chapters follows a bottom-up fashion:
 
 \Cref{sec:nutshexample} starting on \cpageref{sec:nutshexample} shows an example session of a tutorial created for the evaluation, followed by its \emph{nutsh} source code. To get an impression of the interaction style employed by the Nut Shell, it might be beneficial to look at this example before continuing to read.
 
-\todo{More appendices}
+\Cref{sec:lessons} itemizes all lessons that were used in the 
 
 \section{Notation}
 \label{sec:ebnf}
 
-In this thesis, grammars are specified using the \emph{Extended Backus-Naur Form} (EBNF) as defined in \cite{wirth77}. As a convention, capitalized names represent nonterminal symbols, while lowercase names represent terminal symbols. Vertical bars (\texttt{|}) separate alternatives, square brackets (\texttt{[ ]}) denote optional parts and curly brackets (\texttt{\{ \}}) denote zero or more repetitions. Tokens are enclosed in double quotes or back quotes.
+In this thesis, grammars are specified using the \emph{Extended Backus-Naur Form} (EBNF) as defined in \cite{wirth77}. As a convention, capitalized names represent nonterminal symbols, while lowercase names represent terminal symbols. Unless mentioned otherwise, the name of a grammar's first production is its starting symbol.
+
+Vertical bars (\texttt{|}) separate alternatives, square brackets (\texttt{[ ]}) denote optional parts and curly brackets (\texttt{\{ \}}) denote zero or more repetitions. Tokens are enclosed in double quotes or back quotes.
 
 Grammars are displayed in the following style---this is also a specification of the EBNF flavour as used in this thesis, given in EBNF itself:
 
@@ -420,7 +418,11 @@ On the input side, the user's input, originating from the \emph{Terminal}, is mo
 
 The \textsc{EBNF} grammars shown in the following sections describe how the tokenizer processes the output of the command line to split it into tokens.
 
-At a high-level view, the output of the process as a whole consists of three segments: The prompt (with markers, see next section), the composing of the command (which can include escape sequences, or consist of multiple lines), and the command's output. This sequence of segments can repeat indefinitely. The command output simply consists of non-marker characters:
+At a high-level view, the output of the process as a whole consists of three segments:
+The first segment is the prompt, enclosed in markers, as explained in the following section.
+The second segment contains characters entered by the user while composing the command; the segment may include escape sequences and control characters, which are produced while performing editing operations.
+The final segment contains the command's output, that simply consists of non-marker characters.
+This sequence of segments can repeat indefinitely:
 
 \begin{ebnf}
 Output = { PromptWithMarkers CommandComposing CommandOutput } .
@@ -442,8 +444,6 @@ Prompt = { NonMarker } .
 This approach has a downside: In some command line programs it is possible to change the prompt from within the program. If the user tries to change the prompt himself, the tokenizer will probably break.
 
 To add support for a new command line program to the Nut Shell, one has to create a profile that specifies which options and commands are necessary to configure the prompt so it begins and ends with markers.
-
-\todo{Example configurations for IRB and bash?}
 
 \section{Recognizing the command}
 \label{sec:reccmd}
@@ -504,7 +504,7 @@ Because \keys{\ctrl+Y} repeats the whole command as the user intended to run it,
 
 From the content of the “Output” column up to line 9, it is hard to recognize the actual command \texttt{1+1} (which is displayed on the screen) because of the inserted escape sequences and control characters. When the user presses \emph{return}, it is not forwarded, but the previously described sequence is sent to the process instead. In line 9, the cursor is moved to the end of the line using \texttt{\escape{[}[C} (move the cursor forward). In line 11, the command is deleted by moving the cursor to the beginning of the line with \texttt{\escape{H}} and clearing the terminal's current line from the cursor to the right with \texttt{\escape{[}[K}. After that, no new escape sequences appear: The marker is inserted and deleted, the command is repeated, another marker is inserted and deleted, and finally the space character is removed.
 
-When reading the “Output” column, the correct command \texttt{1+1} now appears neatly between the two markers. The first marker is followed by some deletion sequences (they depend on the concrete command line program, but come from a fixed set\todo{specify!}. And the command is always followed by a space character. By removing both, the exact command the user wanted to enter can be extracted.
+When reading the “Output” column, the correct command \texttt{1+1} now appears neatly between the two markers. The first marker is followed by some deletion sequences (they depend on the concrete command line program, but come from a fixed set. And the command is always followed by a space character. By removing both, the exact command the user wanted to enter can be extracted.
 
 In general, for the tokenizer, the composing sequence has two phases: In the first one, the actual command line composing takes place. In the second one, the current line is deleted and reprinted as described above. The interesting part here is \texttt{Command}:
 
@@ -778,8 +778,6 @@ Lesson = { Definition | Line } .
 \emph{nutsh} has a $LR(1)$ grammar, which means it can be parsed reading from left to right by a bottom-up parser in a single pass, creating a rightmost derivation. For parsing, \emph{nutsh} uses a standard $LALR(1)$ parser generator.
 The parser creates a \emph{syntax tree} whose nodes have a string value and zero or more child nodes. For leaf nodes, the string value represents the lexical value, for inner nodes, it represents the node's type.
 
-\todo{Examples of parsed code snippets?}
-
 \section{Interpretation}
 
 When a function definition is encountered, the definition node along with its children is added to the symbol table. After it has been defined, the function can be called until the end of the source file. As functions can only be defined at the top level, no dedicated scoping is necessary.
@@ -823,8 +821,6 @@ By convention, when a prompt is encountered whose \texttt{expect} statements all
 \section{Implementation}
 \label{sec:implementation}
 
-\todo{This section is still incomplete.}
-
 \subsection{Used technologies}
 
 The framework has been implemented in Google Go \cite{google13}, a compiled, statically typed language, which is seen by many as a modern successor to C. This language was a perfect fit for the Nut Shell as it is very fast and was created with low-level programming in mind. Its standard library offered nearly everything needed to implement the Nut Shell. For emulating a terminal, the small \texttt{pty} package\footnote{\url{https://github.com/kr/pty}} was used.
@@ -837,6 +833,8 @@ The online survey was conducted using the open source software \emph{Limesurvey}
 The \texttt{nutsh} program takes two parameters. The second one specifies the tutorial folder. For the first parameter, there are two options: \texttt{run} will start the Nut Shell normally and present a list of lessons to the user to choose from. \texttt{test} will run all lessons in the specified tutorial in the testing mode described in \cref{sec:testing}.
 
 To run the tutorial created for the preparatory course, a Linux distribution is required. Furthermore, the tools used in the tutorial need to be installed: Java, \texttt{pdflatex}, Git, \texttt{make}, an SSH client, a \texttt{locate} implementation, and the GNU coreutils. In case a program is missing, it can be installed at any later time.
+
+(Tuts sind per SSH benutzbar)
 
 %\subsection*{Parsing}
 %
@@ -917,7 +915,7 @@ The third batch of questions was only given to the students who had used the Nut
 
 \section{Results}
 
-For the Survey's first part, there were 64 answers in total. 52 of the participants specified they had used the Nut Shell, 11 of them had used the exercise sheets. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot: The circle marks the median of the answers to each question, the box contains 50\% of the answers, the whiskers reach from the minimum to the maximum answer. According to the participants, the Nut Shell users had significantly \todo{Verify with T-test} more fun and had the impression of having learned more than the exercise users. While there is slight evidence that the Nut Shell users found the course easier, had less time, and thought of the topics to be more relevant, these differences are not statistically meaningful.
+For the Survey's first part, there were 64 answers in total. 52 of the participants specified they had used the Nut Shell, 11 of them had used the exercise sheets. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot: The circle marks the median of the answers to each question, the box contains 50\% of the answers, the whiskers reach from the minimum to the maximum answer. According to the participants, the Nut Shell users had significantly more fun and had the impression of having learned more than the exercise users. While there is slight evidence that the Nut Shell users found the course easier, had less time, and thought of the topics to be more relevant, these differences are not statistically meaningful.
 
 \begin{figure}[p]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -936,10 +934,10 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
                 ymax=8,
             ]
 
-            \addlegendimage{area legend, fill=white, draw=black}
-            \addlegendentry{Exercise Sheets};
             \addlegendimage{area legend, fill=gray, draw=black}
             \addlegendentry{Nut Shell};
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Exercise Sheets};
 
             \addplot[
                 forget plot,
@@ -1120,10 +1118,10 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
                 ymax=1.5,
             ]
 
-            \addlegendimage{area legend, fill=white, draw=black}
-            \addlegendentry{Exercise Sheets};
             \addlegendimage{area legend, fill=gray, draw=black}
             \addlegendentry{Nut Shell};
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Exercise Sheets};
 
             \addplot[
                 forget plot,
@@ -1172,10 +1170,10 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
                 ymax=1.5,
             ]
 
-            \addlegendimage{area legend, fill=white, draw=black}
-            \addlegendentry{Exercise Sheets};
             \addlegendimage{area legend, fill=gray, draw=black}
             \addlegendentry{Nut Shell};
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Exercise Sheets};
 
             \addplot[
                 forget plot,
@@ -1308,10 +1306,10 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
                 ymajorgrids,
             ]
 
-            \addlegendimage{area legend, fill=white, draw=black}
-            \addlegendentry{Exercise Sheets};
             \addlegendimage{area legend, fill=gray, draw=black}
             \addlegendentry{Nut Shell};
+            \addlegendimage{area legend, fill=white, draw=black}
+            \addlegendentry{Exercise Sheets};
 
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};    % Plot the "First" column against the data index
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot2, x expr=\coordindex] {\datatable};
