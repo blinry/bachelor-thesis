@@ -189,7 +189,7 @@ Most approaches to teach command line interfaces involve static text: There are 
 
 This thesis describes a system that provides a much more direct, interactive teaching approach. The core idea is to interweave the tutorial text and the output of the command line system and to make the tutorial watch the user's commands, as well as the command line system's state and output, to allow direct response to the user's actions.
 
-This approach is inspired by text adventures. \Cref{fig:zork} shows one of the earliest programs of this kind, \textsc{Zork}, originally released in 1979 by members of the MIT Dynamic Modelling Group \cite{infocom}. In this game, the player types short commands of what he wants to do, and the game responds with a description of what effects these actions produce. Tutorials for technical systems could work similarly: They could provide direct feedback to the user's commands and support him when he makes mistakes or has problems (note \textsc{Zork}'s response to \texttt{examine mailbox}).
+This approach is inspired by text adventures. \Cref{fig:zork} shows one of the earliest programs of this kind, \textsc{Zork}, originally released in 1979 by members of the MIT Dynamic Modelling Group \cite{infocom}. In this game, the player types short commands of what he wants to do, and the game responds with a description of what effects these actions produce. Tutorials for technical systems could work similarly: They could provide direct feedback to the user's commands and support him when he makes mistakes or encounters problems (note \textsc{Zork}'s response to \texttt{examine mailbox}).
 
 \begin{figure}[tb]
     \begin{lstlisting}[escapechar=@,frame=shadowbox]
@@ -252,11 +252,11 @@ The structure of the chapters follows a bottom-up fashion:
 
 \Cref{sec:evaluation} describes application and evaluation of the Nut Shell in a study that compared the new teaching approach with tutorials based on static text, and tried to find out whether the former offers any benefits.
 
+\Cref{sec:conclusions} finally provides an outlook and suggests ideas for future work.
+
 %\Cref{sec:implementation} provides an overview of the Nut Shell's implementation and describes usage and installation.
 
-\Cref{sec:nutshexample} starting on \cpageref{sec:nutshexample} shows an example session of a tutorial created for the evaluation, followed by its \emph{nutsh} source code. To get an impression of the interaction style employed by the Nut Shell, it might be beneficial to look at this example before continuing to read.
-
-\Cref{sec:lessons} itemizes all lessons that were used in the 
+\Cref{sec:nutshexample}, starting on \cpageref{sec:nutshexample}, shows an example session of a tutorial created for the evaluation, followed by its \emph{nutsh} source code. To get an impression of the interaction style employed by the Nut Shell, it might be beneficial to look at this example before continuing to read.
 
 \section{Notation}
 \label{sec:ebnf}
@@ -614,7 +614,7 @@ interpreted_string = `"` { unicode_char | escaped_char |
 
 \minisec{String Expressions}
 
-The \emph{nutsh} language makes strong use of strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, it can be checked whether a string matches a regular expression (\texttt{"foo" =\textasciitilde\ "f[aio]."}).\footnote{Using the syntax of the regular expression parsing library \emph{RE2} as described here: \url{https://code.google.com/p/re2/wiki/Syntax}} Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common boolean operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or}) are defined accordingly. They return the (arbitrary) nonempty string \texttt{"true"} as a truth value.
+The \emph{nutsh} language makes strong use of strings (\texttt{"foo"}). String expressions can be concatenated (\texttt{"foo"+"foo"} has the same value as \texttt{"foofoo"}) and be checked for equality (\texttt{"foo" == "foo"}). Additionally, it can be checked whether a string matches a regular expression (\texttt{"foo" =\textasciitilde\ "f[aio]."}).\footnote{Using the syntax of the regular expression parsing library \emph{RE2} as described here: \url{http://code.google.com/p/re2/wiki/Syntax}} Every string can be interpreted as a truth value, which is \emph{false} for an empty string and \emph{true} otherwise. The common boolean operators (\texttt{!} for \emph{not}, \texttt{\&\&} for \emph{and}, and \texttt{||} for \emph{or}) are defined accordingly. They return the (arbitrary) nonempty string \texttt{"true"} as a truth value.
 
 \begin{ebnf}
 StringExpression =
@@ -816,29 +816,27 @@ The testing algorithm first collects all \texttt{expect} statements and creates 
 
 It then starts interpreting the file like normally, but when a \texttt{prompt} statement is encountered, instead of querying the user for a command, one of the unreached associated \texttt{expect} commands is used. When the respective \texttt{expect} statement indeed is reached, the statement is marked as “reached”. When the end of the prompt loop is encountered, and the \texttt{expect} has not been reached, an error is printed and the test is aborted. At the end of the file, if there are any unreached \texttt{expect} statements left, the lesson is restarted.
 
-By convention, when a prompt is encountered whose \texttt{expect} statements all are reached, the first one is used. Thus, the first \texttt{expect} in each prompt should be one that leads to a \texttt{break} statement to ensure the testing algorithm terminates.
+By convention, when a prompt is encountered whose \texttt{expect} statements all are reached, the first one is used. Thus, the first \texttt{expect} in each prompt should be one that leads to a \texttt{break} statement to ensure the testing algorithm terminates. While this has not been implemented yet, a more flexible approach would be to create a \emph{control flow graph} for the lesson and ensure that every branch is considered while testing by choosing \texttt{expect} statements that lead to not yet tested parts of the lesson.
 
-\section{Implementation}
+\chapter{Implementation}
 \label{sec:implementation}
 
-\subsection{Used technologies}
+The framework has been implemented in \emph{Go} \cite{google13}, a young, compiled, statically typed language, which is seen by many as a modern successor to C. This language was a good fit for the Nut Shell as it is fast, was created with low-level programming in mind, and has a big standard library with built-in support for Unicode and UTF-8.
 
-The framework has been implemented in Google Go \cite{google13}, a compiled, statically typed language, which is seen by many as a modern successor to C. This language was a perfect fit for the Nut Shell as it is very fast and was created with low-level programming in mind. Its standard library offered nearly everything needed to implement the Nut Shell. For emulating a terminal, the small \texttt{pty} package\footnote{\url{https://github.com/kr/pty}} was used.
+The implementation uses folders to represent tutorials, which can contain several lesson files written in the \emph{nutsh} language. A configuration file named \texttt{info.yaml} specifies the tutorial's name and the target command line program that is to be used.
 
-The online survey was conducted using the open source software \emph{Limesurvey}.\footnote{\url{https://www.limesurvey.org/}}
+The source code is organized in four subpackages: The \texttt{cli} package implements the command line abstraction layer as described in \cref{sec:cliparser}. It uses the \texttt{pty} package\footnote{\url{http://github.com/kr/pty}} to emulate a terminal, and starts a thread for each component in \cref{fig:architecture}. Go's built-in support for concurrency and synchronized communication between threads came in handy here.
 
-\subsection{Installation and Usage}
-\label{sec:usage}
+The \texttt{dsl} package uses the abstraction layer to provide an internal API that allows easy access to important operations, like starting and destroying command line processes, prompting the user for a command or sending a hidden query to the command line.
 
-The \texttt{nutsh} program takes two parameters. The second one specifies the tutorial folder. For the first parameter, there are two options: \texttt{run} will start the Nut Shell normally and present a list of lessons to the user to choose from. \texttt{test} will run all lessons in the specified tutorial in the testing mode described in \cref{sec:testing}.
+The \texttt{model} package understands the directory structure described above, and provides operations like initializing a tutorial, presenting a list of lessons to the user to choose from, or saving the current progress. The progress simply consists of a list of finished lessons, so they can be displayed as “done”. The \texttt{goyaml} package\footnote{\url{http://launchpad.net/goyaml}} was used to read and write configuration files written in the \textsc{YAML} markup language.
 
-To run the tutorial created for the preparatory course, a Linux distribution is required. Furthermore, the tools used in the tutorial need to be installed: Java, \texttt{pdflatex}, Git, \texttt{make}, an SSH client, a \texttt{locate} implementation, and the GNU coreutils. In case a program is missing, it can be installed at any later time.
+Finally, the \texttt{parser} package is responsible for lexing, parsing, interpreting and testing single \emph{nutsh} files. For parsing, this package uses \textsc{YACC}, a widely used $LALR(1)$ parser generator that takes a list of token types, a grammar description and an operator precedence declaration and then generates a function that receives tokens from the lexer and parses them. Go comes with its own YACC implementation.\footnote{\url{http://golang.org/cmd/yacc/}}
 
-(Tuts sind per SSH benutzbar)
+%Refer to \cref{sec:usage} for installation and usage instructions.
 
 %\subsection*{Parsing}
 %
-%To parse the token stream into a parse tree, the framework used \textsc{YACC}. \textsc{YACC} is a $LALR(1)$ parser generator that takes a list of token types, a grammar description and a operator precedence declaration and generates a function that takes tokens from the lexer and parses them. Go comes with its own YACC implementation.\footnote{\url{http://golang.org/cmd/yacc/}}
 %
 %(ref: http://dinosaur.compilertools.net/yacc/)
 
@@ -1336,22 +1334,23 @@ That is why only the evaluation regarding the number of participants over time i
 Another positive result is the lowered demand for external help the Nut Shell users had. On the one hand, this is pleasing for the students themselves, as they can learn more independently---for example, from home, where no external help is available. On the other hand, the number of required student assistants can be lowered, leading to reduced costs for the university while apparently maintaining about the same quality of education.
 
 \chapter{Conclusions and Future Work}
+\label{sec:conclusions}
 
-During the evaluation, the student's general feedback was very positive. Some were eager to install Linux on their own computers so they could continue to use the tutorial. Because of the evaluation's positive outcome, the Nut Shell will be used for the upcoming preparatory courses as well. Another institute has already shown interest to use the Nut Shell for a more in-depth course on the version control software Git. During the preparatory course, a participating student told us he would like to use the Nut Shell to teach the command line to pupils at his old school.
+Because of the evaluation's positive outcome, the Nut Shell will be used for the upcoming preparatory courses as well. Another institute has already shown interest to use the Nut Shell for a more in-depth course on the version control software \emph{Git}. During the preparatory course, a participating student told us he would like to use the Nut Shell to teach command line concepts to pupils at his old school.
 
-Of course, there is a lot of potential for further development. Right now, typing errors can only be catched by defining some \texttt{command} checks by hand. The \texttt{expect}-Statements could be used to automate the detection of these errors by measuring the \emph{edit distance}\footnote{For example, the Levenshtein distance, that detects insertions, deletions and substitutions \cite{levenshtein66}.} between the entered command and the expected commands. When the distance falls below a certain threshold, the correct command could be suggested to the user.
+The student's general feedback during the evaluation was very positive. Some were eager to install Linux on their own computers so they could continue to use the tutorial. Some requested that the Nut Shell should be made available in all the university's Linux computer rooms. Another path was chosen: Because the program is a terminal application, it can be used remotely via an SSH connection. It is now possible to use the Nut Shell on the university's shell server from virtually everywhere.
 
-While the syntax of the \texttt{prompt} statement clearly communicates its semantic structure, in practical use it seems cumbersome, as it is repeated so often. The syntax could be even futher simplified here so that blocks of \texttt{if} clauses imply a \texttt{prompt} block around it. Another language element for \emph{preventing} this automation would have to be added, as well.
+Development of the Nut Shell will continue. The software and the tutorial will be released under a free, open source license to allow everyone to use and improve them.
+
+\subsection*{Future work}
+
+Of course, there is a lot of potential for further development. Right now, typing errors can only be catched by defining appropriate \texttt{command} checks by hand. The \texttt{expect}-statements could be used to automate the detection of these errors by measuring the \emph{edit distance}\footnote{For example, the Levenshtein distance, that detects insertions, deletions and substitutions \cite{levenshtein66}.} between the entered and the expected commands. When the distance falls below a certain threshold, the correct command could be suggested to the user.
+
+While the syntax of the \texttt{prompt} statement clearly communicates its semantic structure, in practical use it seems cumbersome, as it is repeated so often. The syntax could be simplified here, so that blocks of \texttt{if} clauses imply a \texttt{prompt} statement around them. Another language element for preventing this automation would have to be added as well.
 
 Right now, the lessons of a tutorial follow a linear order. It would make sense to structure them as a dependency graph, in which the author can specify for each lesson, which other lessons have to be finished before. This would give the user more freedom to navigate through the tutorial on his own behalf.
 
-%goal-oriented syntax?
-
-The users' feedback while using the tutorial can be very valuable to improve it. This feedback collection could be automated by recording the user's interaction and tracking their progress over time. For example, when users do not reach new \texttt{prompt} statements for a longer time period, or enter disproportionately many commands in one \texttt{prompt} loop this could be an indication that this section is too hard and should get more hints. The wrong commands can also be automatically collected, analyzed, and be presented to the author so that he can create appropriate hints in the lesson.
-
-During the evaluation, it was a problem when the students entered many commands and had to scroll the terminal output up to read the tutorial text. The Nut Shell should provide a special command to repeat the last few tutorial lines.
-
- Development on the Nut Shell will continue and it will be released under an free license to allow others to benefit from it.
+The users' feedback while using the tutorial can be very valuable to improve it. This feedback collection could be automated by recording the user's interaction and tracking their progress over time. For example, when users do not reach new \texttt{prompt} statements for a longer time period, or enter disproportionately many commands in one \texttt{prompt} loop, this could indicate that this section is too hard and should contain more hints. Misspelled or unhelpful commands could also be automatically collected, analyzed, and be presented to the author so that he can add appropriate hints to the lesson.
 
 \appendix
 
@@ -1408,6 +1407,15 @@ The following lessons were part of the preparatory course:
         \item Automation with makefiles
     \end{enumerate}
 \end{multicols}
+
+%\chapter{Installation and Usage}
+%\label{sec:usage}
+%
+%The Nut Shell's source code can be obtained fuu TODO.
+%
+%The \texttt{nutsh} program takes two parameters: The second one specifies the directory that contains the tutorial. For the first parameter, there are two options: \texttt{run} will start the Nut Shell normally and present a list of lessons to the user to choose from. \texttt{test} will run all lessons in the specified tutorial in \emph{testing mode} as described in \cref{sec:testing}.
+%
+%To run the tutorial created for the preparatory course, a Linux distribution is required. Furthermore, the tools used in the tutorial need to be installed: Java, \texttt{pdflatex}, Git, \texttt{make}, an SSH client, a \texttt{locate} implementation, and the GNU coreutils. In case a program is missing, it can be installed at any later time.
 
 \listoffigures
 
