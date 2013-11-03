@@ -1,4 +1,4 @@
-\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,toc=listof,12pt,appendixprefix=true]{scrreprt}
+\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,12pt,appendixprefix=true]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -116,41 +116,12 @@
 Institute for Programming and Reactive Systems\\
 Prof. Dr. Ursula Goltz\\[\baselineskip]
 Advisor: Dr. Werner Struckmann}
-\uppertitleback{
-    \subsection*{Affidavit}
-    This thesis is my own unaided work. All sources are acknowledged as references.
-
-    Ich habe diese Abschlussarbeit selbstständig verfasst. Alle Quellen wurden angegeben.
-    \\\\
-    \vskip 5mm
-    Braunschweig, 2013--11--03
-    \hskip 1cm \dotfill
-}
-
-\lowertitleback{
-\subsection*{Acknowledgments}
-
-I would like to thank the following people for their support in the creation of this thesis:
-
-Werner Struckmann patiently answered every question I had.
-Hendrik Freytag provided the list of test questions for the evaluation.
-Arne Brüsch and Markus Reschke helped making the evaluation a lot of fun and contributed interesting ideas.
-Heike Laschin, Moritz Mühlhausen and Leslie Wöhler did some early beta-testing and influenced the style of the final tutorial.
-My family gave me a great amount of support and motivation.
-And finally, I want to thank the 120 students who bravely participated in the first evaluation of the Nut Shell and gave helpful and encouraging feedback.
-
-\subsection*{Colophon}
-
-This document was created using \LaTeXe\ by Leslie Lamport and contributors, and \KOMAScript\ by Frank Neukam, Markus Kohm, and Axel Kielhorn. The figures were created using PGFPlots by Christian Feuersänger and Ti\textit{k}Z by Till Tantau, the key combinations were produced with \emph{menukeys} by Tobias Weh. The text is set in the Latin Modern font family by Bogusław Jackowski, Janusz M. Nowacki and Marcin Woliński, the monospaced font is \texttt{Bera Mono}, based on Bitstream Vera.}
 
 \begin{document}
 
 \newgeometry{left=2.5cm,right=2.5cm}
 \maketitle
 \restoregeometry
-
-%\clearpage
-%\pagenumbering{roman}
 
 \begin{abstract}
     Command line interfaces provide powerful, expressive means to interact with computers, but compared to graphical user interfaces, they have a steep learning curve. Inspired by text adventures, this thesis introduces a new interface concept for teaching command line programs: An interactive, terminal-based tutorial environment, where the documentation reacts to the user's commands, to the command line's response and its internal state.
@@ -177,6 +148,33 @@ This document was created using \LaTeXe\ by Leslie Lamport and contributors, and
     In einer zweiwöchigen Auswertung mit etwa 120 Teilnehmern zeigte ein mit der Nut Shell erstelltes Tutorial klare Vorteile gegenüber einem Lehransatz, der auf statischem Text basierte: Benutzer der Nut Shell waren motivierter, an dem Kurs teilzunehmen, sie hatten mehr Spaß, lernten mehr, und konnten selbstständiger arbeiten.
 \end{abstract}
 \selectlanguage{english}%
+
+\cleardoublepage
+
+\section*{Acknowledgments}
+
+I would like to thank the following people for their support in the creation of this thesis:
+Werner Struckmann patiently answered every question I had.
+Hendrik Freytag provided the list of test questions for the evaluation.
+Arne Brüsch and Markus Reschke helped making the evaluation a lot of fun and contributed interesting ideas.
+Heike Laschin, Moritz Mühlhausen and Leslie Wöhler did some early beta-testing and influenced the style of the final tutorial.
+Jan Steiner helped proof-reading the final document.
+My family gave me a great amount of support and motivation.
+And finally, I want to thank the 120 students who bravely participated in the first evaluation of the Nut Shell and gave helpful and encouraging feedback.
+
+\section*{Colophon}
+
+This document was created using \LaTeXe\ by Leslie Lamport and contributors, and \KOMAScript\ by Frank Neukam, Markus Kohm, and Axel Kielhorn. The figures were created using PGFPlots by Christian Feuersänger and Ti\textit{k}Z by Till Tantau, the key combinations were produced with \emph{menukeys} by Tobias Weh. The text is set in the Latin Modern font family by Bogusław Jackowski, Janusz M. Nowacki and Marcin Woliński, the monospaced font is \texttt{Bera Mono}, based on Bitstream Vera.
+
+\section*{Affidavit}
+
+This thesis is my own unaided work. All sources are acknowledged as references.
+
+Ich habe diese Abschlussarbeit selbstständig verfasst. Alle Quellen wurden angegeben.
+\\\\
+\vskip 5mm
+Braunschweig, 2013--11--03
+\hskip 1cm \dotfill
 
 \setcounter{tocdepth}{2}
 \tableofcontents
@@ -223,7 +221,7 @@ Goal of this thesis is to design, implement, apply and evaluate a framework that
 
 \section{Prior work}
 
-\emph{Try Ruby} was an interactive online tutorial that would provide an introduction to the Ruby scripting language in the web browser. A notable anonymous programmer called “\_why” first published it at the end of 2005. To the author's knowledge, this was the first attempt at creating interactive command line tutorials \cite{why05}. The interface consisted of two sections: One side contained the current task, the other side held an interactive Ruby prompt. The user would then type in commands, and the application would check whether either the command or the interpreter's output matched a regular expression. In this case, the current exercise would be solved and the tutorial would advance to the next one.
+\emph{Try Ruby} was an interactive online tutorial that would provide an introduction to the Ruby scripting language in the web browser. A notable anonymous programmer called “\_why” first published it at the end of 2005. To the author's knowledge, this was the first attempt to create interactive command line tutorials \cite{why05}. The interface consisted of two sections: One side contained the current task, the other side held an interactive Ruby prompt. The user would then type in commands, and the application would check whether either the command or the interpreter's output matched a regular expression. In this case, the current exercise would be solved and the tutorial would advance to the next one.
 The site went offline in early 2009, but some members of the Ruby community continue development.
 
 A web site called \emph{Codecademy}\footnote{\url{http://www.codecademy.com}} deploys several interactive tutorials, which focus on teaching programming in Ruby, Python, JavaScript and PHP. The tutorials consist of multiple exercises, in each of which users get a piece of unfinished code in addition to a task. They are then supposed to fix or complete the code so that it satisfies a number of conditions, which can be quite complex. Every time the code is saved, the conditions are checked. On success, the tutorial advances to the next exercise.
@@ -333,7 +331,7 @@ Nowadays, modern terminal emulators mimic the behaviour of the classical compute
 
 Additionally, the \textsc{ASCII} characters below 32, the \emph{control characters}, have special meanings in terminals.
 %\Cref{sec:esc} lists the control characters and the escape sequences which are still common today.
-To denote control characters, which would be invisible otherwise, \emph{caret notation} is commonly used: To represent the \textsc{ASCII} character of the value $n$, a caret symbol (\texttt{\textasciicircum}), combined with the \textsc{ASCII} character with the value $n+64$ is used. For example, the \emph{backspace} character has the \textsc{ASCII} value $8$; the \textsc{ASCII} character with the value $72$ is \texttt{H}, so the caret notation for a \emph{backspace} is \texttt{\escape{H}}. This notation originates from the fact that in old terminals, the control characters could be entered by pressing \keys{\ctrl} and the respective letter key. For some characters this is still true today: For example, \keys{\ctrl+D} produces \emph{end of file}, \keys{\ctrl+H} produces \emph{backspace}, and \keys{\ctrl+J} produces a \emph{line feed} character.
+To denote control characters, which would be invisible otherwise, \emph{caret notation} is commonly used: To represent the \textsc{ASCII} character of the value $n$, a caret symbol (\texttt{\textasciicircum}) is combined with the \textsc{ASCII} character with the value $n+64$. For example, the \emph{backspace} character has the \textsc{ASCII} value $8$; the \textsc{ASCII} character with the value $72$ is \texttt{H}, so the caret notation for a \emph{backspace} is \texttt{\escape{H}}. This notation originates from the fact that in old terminals, the control characters could be entered by pressing \keys{\ctrl} and the respective letter key. For some characters this is still true today: For example, \keys{\ctrl+D} produces \emph{end of file}, \keys{\ctrl+H} produces \emph{backspace}, and \keys{\ctrl+J} produces a \emph{line feed} character.
 
 \section{Readline}
 
@@ -517,9 +515,7 @@ Command = { NonMarker } .
 
 \subsection*{Multi-line commands}
 
-Before execution, some \textsc{CLI}s check whether an entered command is somehow incomplete: It could, for example, lack a closing parenthesis, or end with an operator. In this case, the program does not execute the command, but gives the user the possibility to finish it. For this purpose, the \textsc{CLI} usually displays a prompt which is different to the primary prompt, so that the user can tell the difference.
-
-The framework inserts the second marker in the secondary prompt, so that it can be recognized and differentiated from a normal prompt.
+Before execution, some \textsc{CLI}s check whether an entered command is somehow incomplete: It could, for example, lack a closing parenthesis, or end with an operator. In this case, the program does not execute the command, but gives the user the possibility to finish it. For this purpose, the \textsc{CLI} usually displays a prompt which is different to the primary prompt, so that the user can tell the difference. The framework inserts the second marker into this secondary prompt, so that it can be appropriately recognized, as well.
 
 After the previously described line repetition, the tokenizer looks at the next character---if it is a secondary-prompt-marker, it knows another composing-and-repeating step will follow, as the user will now type a second line:
 
@@ -547,7 +543,7 @@ To enable authors to write tutorials for the Nut Shell quickly, the framework in
 
 \section{Design goals}
 
-The lesson's source code should be as easy to read and to write as possible. To achieve this, \emph{nutsh} uses a syntax that in large parts resembles languages that potential users already may know. In this case, it resembles the syntax of C, with some influences of Google Go \cite{google13}, for example in the definition of string literals and the syntax of conditional clauses. It also uses regular expressions and a few elements of the markup language \emph{Markdown}.
+The lesson's source code should be as easy to read and write as possible. To achieve this, \emph{nutsh} uses a syntax that in large parts resembles languages that potential users already may know. In this case, it resembles the syntax of C, with some influences of Google Go \cite{google13}, for example in the definition of string literals and the syntax of conditional clauses. It also uses regular expressions and a few elements of the markup language \emph{Markdown}.
 
 Another design goal was to keep the language as small as possible, while making it powerful enough for the intended purpose. For this reason, its only data type is a string of Unicode characters. Variables also proved unnecessary.
 
