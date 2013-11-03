@@ -504,7 +504,7 @@ Because \keys{\ctrl+Y} repeats the whole command as the user intended to run it,
 
 From the content of the “Output” column up to line 9, it is hard to recognize the actual command \texttt{1+1} (which is displayed on the screen) because of the inserted escape sequences and control characters. When the user presses \emph{return}, it is not forwarded, but the previously described sequence is sent to the process instead. In line 9, the cursor is moved to the end of the line using \texttt{\escape{[}[C} (move the cursor forward). In line 11, the command is deleted by moving the cursor to the beginning of the line with \texttt{\escape{H}} and clearing the terminal's current line from the cursor to the right with \texttt{\escape{[}[K}. After that, no new escape sequences appear: The marker is inserted and deleted, the command is repeated, another marker is inserted and deleted, and finally the space character is removed.
 
-When reading the “Output” column, the correct command \texttt{1+1} now appears neatly between the two markers. The first marker is followed by some deletion sequences (they depend on the concrete command line program, but come from a fixed set. And the command is always followed by a space character. By removing both, the exact command the user wanted to enter can be extracted.
+When reading the “Output” column, the correct command \texttt{1+1} now appears neatly between the two markers. The first marker is followed by a deletion sequence, and the command is always followed by a space character. By removing both, the exact command the user wanted to enter can be extracted.
 
 In general, for the tokenizer, the composing sequence has two phases: In the first one, the actual command line composing takes place. In the second one, the current line is deleted and reprinted as described above. The interesting part here is \texttt{Command}:
 
@@ -913,7 +913,7 @@ The third batch of questions was only given to the students who had used the Nut
 
 \section{Results}
 
-For the Survey's first part, there were 64 answers in total. 52 of the participants specified they had used the Nut Shell, 11 of them had used the exercise sheets. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot: The circle marks the median of the answers to each question, the box contains 50\% of the answers, the whiskers reach from the minimum to the maximum answer. According to the participants, the Nut Shell users had significantly more fun and had the impression of having learned more than the exercise users. While there is slight evidence that the Nut Shell users found the course easier, had less time, and thought of the topics to be more relevant, these differences are not statistically meaningful.
+For the Survey's first part, there were 64 answers in total. 52 of the participants specified they had used the Nut Shell, 11 of them had used the exercise sheets. \Cref{fig:general} juxtaposes the answers to the general questions in both groups in the form of a box plot: The circle marks the median of the answers to each question, the box contains 50\% of the answers, the whiskers reach from the minimum to the maximum answer. The Nut Shell users had more fun and had the impression of having learned more than the exercise users. The \emph{unpaired two-sample t-test} yields $p$-values of $0.054$ respectively $0.060$, which means that there is a chance of 5--6\% that this difference is accountable to random. While there is slight evidence that the Nut Shell users found the course easier, had less time, and thought of the topics to be more relevant, these differences are not statistically significant.
 
 \begin{figure}[p]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1097,7 +1097,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
     \label{fig:general}
 \end{figure}
 
-\Cref{fig:help} shows the answers to the question regarding how many times per day the participant needed support from a student assistant. Clearly, the Nut Shell users only needed half as much help compared to the exercise users.
+\Cref{fig:help} shows the answers to the question regarding how many times per day the participants needed support from a student assistant. Clearly, the Nut Shell users only needed half as much help compared to the exercise users.
 
 \begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1149,7 +1149,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
     \label{fig:help}
 \end{figure}
 
-\Cref{fig:test} shows the distribution of test scores. The hightest achievable score was $12$. The exercise sheet group achieved a slightly higher score.
+\Cref{fig:test} shows the distribution of test scores. The hightest achievable score was $12$. The test was filled out by 53 people: 43 were users of the Nut Shell and 10 used the exercise sheets. On average, the exercise sheet group achieved a slightly higher score.
 
 \begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1271,7 +1271,7 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
     \label{fig:meta}
 \end{figure}
 
-\Cref{fig:participants} shows the number of participants per day in both groups. In this case, 63.8\% of the Nut Shell users stayed until the last day. Of the exercise sheet users, only 24.4\% stayed. Of the 52 Nut Shell students who attended on the last day, 42 (80.8\%) actually completed the tutorial.
+\Cref{fig:participants} shows the number of participants per day in both groups. In this case, from the initial 80 Nut Shell users, 63.8\% stayed until the last day. Of the exercise sheet users, only 24.4\% of the initial 45 stayed. Of the 52 Nut Shell students who attended on the last day, 42 (80.8\%) actually completed the tutorial.
 
 \begin{figure}[tb]
     \begin{tikzpicture}[trim axis left, trim axis right]
@@ -1327,9 +1327,9 @@ For the Survey's first part, there were 64 answers in total. 52 of the participa
 
 \section{Discussion}
 
-The small number of participants in the exercise sheet group who participated in the survey are a problem. The results are likely to be warped, as just those participants who had fun and learned something stayed.
+The small number of participants in the exercise sheet group who participated in the survey is a problem for proper evaluation: The results are likely to be warped, as just those participants who had fun and learned something stayed, while the students that were bored or learned nothing stopped attending the course.
 
-That is why only the evaluation regarding the number of participants over time is really meaningful. According to the course's organizers and former assistants, the high participant loss that occurred in the exercise sheet group is indeed typical and representative for the course. This could mean that the Nut Shell lesson motivated the students more to attend to the course. From a lecturer's perspective, this result of keeping 63.8\% of the students motivated to attend over the whole timespan, is highly gratifying.
+That the evaluation approach shifted towards looking at the number of participants over time. According to the course's organizers and former assistants, the high participant loss that occurred in the exercise sheet group is indeed typical and representative. This could mean that the Nut Shell lesson motivated the students more to attend to the course. From a lecturer's perspective, this result of having 63.8\% of the students attending over the whole timespan, is highly gratifying.
 
 Another positive result is the lowered demand for external help the Nut Shell users had. On the one hand, this is pleasing for the students themselves, as they can learn more independently---for example, from home, where no external help is available. On the other hand, the number of required student assistants can be lowered, leading to reduced costs for the university while apparently maintaining about the same quality of education.
 
