@@ -2,23 +2,18 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{slantsc}
-\usepackage[scaled]{beramono}
-\usepackage[ngerman,english]{babel}
-\usepackage[style=numeric]{biblatex}
+
+\usepackage{lmodern} % latin modern font family
+\usepackage{slantsc} % enable italic small caps
+\usepackage[scaled]{beramono} % default bold typewriter fontface isn't bold enough
+\usepackage[ngerman,english]{babel} % hyphenation, captions. german for second abstract version
+\usepackage[style=numeric]{biblatex} % bibliography, cite with "[number]"
     \addbibresource{bibliography.bib}
-
-\usepackage{xcolor}
+\usepackage{xcolor} % define your own colors, yo!
     \definecolor{medium-blue}{rgb}{0,0,0.5}
-
-%\setcitestyle{super,square}
-
-\usepackage{blindtext}
-\usepackage{multicol}
-\usepackage{graphicx}
-    \graphicspath{ {images/} }
-\usepackage{pgfplots, pgfplotstable}
+\usepackage{multicol} % multiple-column environment
+\usepackage{graphicx} % include graphics
+\usepackage{pgfplots, pgfplotstable} % draw pretty plots
     \pgfplotsset{compat=1.8}
     \usepgfplotslibrary{statistics}
     \pgfplotsset{
@@ -33,6 +28,7 @@
                 ;
             },
         },
+        % styles for comparative box plot:
         rshift/.style={
             yshift=+\pgfkeysvalueof{/pgfplots/rshift scale},
             legend image post style={yshift=-\pgfkeysvalueof{/pgfplots/rshift scale}},
@@ -51,7 +47,7 @@
         lshift scale/.initial=1.2em,
     }
 
-\usetikzlibrary{patterns,arrows,fit}
+\usetikzlibrary{patterns,arrows,fit} % subpackages for drawing package "TikZ"
     \makeatletter
     \newcommand\resetstackedplots{
         \makeatletter
@@ -61,26 +57,23 @@
     }
     \makeatother
 
-\usepackage{soul}
+\usepackage{soul} % change text foreground and background color
     \sethlcolor{darkgray}
     \newcommand{\invert}[1]{\textcolor{white}{\hl{#1}}}
     \newcommand{\cursor}{\invert{ }}
     \newcommand{\escape}[1]{\textasciicircum #1}
-\usepackage{hyperref}
-    \hypersetup{
-        hidelinks
-        %colorlinks, linkcolor={medium-blue},
-        %citecolor={medium-blue}, urlcolor={medium-blue}
+\usepackage{hyperref} % automatically link stuff in PDFs
+    \hypersetup{ % to hide links, use option 'hidelinks' instead, duh!
+        colorlinks, linkcolor={medium-blue},
+        citecolor={medium-blue}, urlcolor={medium-blue}
     }
-\usepackage[nameinlink]{cleveref}
-\usepackage[os=win]{menukeys}
+\usepackage[nameinlink]{cleveref} % \cref creates reference with type, like "section 3.1.4"
+\usepackage[os=win]{menukeys} % pretty key combinations
     \renewmenumacro{\keys}[+]{shadowedroundedkeys}
-\usepackage{syntax}
-%\usepackage{courier}
-\usepackage{microtype}
+\usepackage{microtype} % typographic perfection
     \DisableLigatures[<,>]{family=tt*}
-\usepackage{geometry}
-\usepackage{listings}
+\usepackage{geometry} % change page borders (for centered titlepage)
+\usepackage{listings} % code snippets
     \lstdefinelanguage{nutsh}{
         morekeywords={if,else,prompt,def,break,return},
         sensitive=false,
@@ -105,6 +98,7 @@
     \lstdefinestyle{nutshstyle}{language=nutsh,xleftmargin=\parindent}
     \lstnewenvironment{ebnf}{\lstset{style=ebnfstyle}}{}
     \lstnewenvironment{nutsh}{\lstset{style=nutshstyle}}{}
+
 
 \titlehead{\includegraphics[height=2cm]{tu-logo.pdf} \hfill \includegraphics[height=2cm]{ips.pdf}}
 
@@ -253,8 +247,6 @@ The chapter's structure follows a bottom-up fashion:
 
 \Cref{sec:conclusions} provides an outlook and suggests ideas for future work.
 
-%\Cref{sec:implementation} provides an overview of the Nut Shell's implementation and describes usage and installation.
-
 \Cref{sec:nutshexample}, starting on \cpageref{sec:nutshexample}, shows an example session of a tutorial created for the evaluation, followed by its \emph{nutsh} source code. To get an impression of the interaction style employed by the Nut Shell, it may be beneficial to look at this example before continuing to read.
 
 \section{Notation}
@@ -284,7 +276,6 @@ Repetition  = "{" Expression "}" .
 \label{sec:cli}
 
 A \emph{command line interface} (\textsc{CLI}) allows a user to communicate with a computer program by entering lines of text, the \emph{command lines}.
-%This thesis focuses on purely character-based command line interfaces that have no graphical capabilities.
 
 Commonly, interaction with a \textsc{CLI} consists of three phases:
 
@@ -835,13 +826,6 @@ The \texttt{model} package understands the directory structure described earlier
 
 Finally, the \texttt{parser} package is responsible for lexing, parsing, interpreting and testing single \emph{nutsh} files as described in \cref{sec:lang}. For parsing, this package uses \textsc{YACC}, a widely used $LALR(1)$ parser generator that takes a list of token types, a grammar description and an operator precedence declaration and then generates a function that receives tokens from the lexer and parses them. Go comes with its own YACC implementation.\footnote{\url{http://golang.org/cmd/yacc/}}
 
-%Refer to \cref{sec:usage} for installation and usage instructions.
-
-%\subsection*{Parsing}
-%
-%
-%(ref: http://dinosaur.compilertools.net/yacc/)
-
 \chapter{Application and Evaluation}
 \label{sec:evaluation}
 
@@ -1309,7 +1293,7 @@ For the survey's first part, there were 64 answers in total. 53 of the participa
             \addlegendimage{area legend, fill=white, draw=black}
             \addlegendentry{Exercise Sheets};
 
-            \addplot [fill=gray, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};    % Plot the "First" column against the data index
+            \addplot [fill=gray, bar shift=-.2cm] table [y=Slot1, x expr=\coordindex] {\datatable};
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot2, x expr=\coordindex] {\datatable};
             \addplot [fill=gray, bar shift=-.2cm] table [y=Slot3, x expr=\coordindex] {\datatable};
 
@@ -1410,24 +1394,12 @@ The following lessons were part of the preparatory course:
     \end{enumerate}
 \end{multicols}
 
-%\chapter{Installation and Usage}
-%\label{sec:usage}
-%
-%The Nut Shell's source code can be obtained fuu TODO.
-%
-%The \texttt{nutsh} program takes two parameters: The second one specifies the directory that contains the tutorial. For the first parameter, there are two options: \texttt{run} will start the Nut Shell normally and present a list of lessons to the user to choose from. \texttt{test} will run all lessons in the specified tutorial in \emph{testing mode} as described in \cref{sec:testing}.
-%
-%To run the tutorial created for the preparatory course, a Linux distribution is required. Furthermore, the tools used in the tutorial need to be installed: Java, \texttt{pdflatex}, Git, \texttt{make}, an SSH client, a \texttt{locate} implementation, and the GNU coreutils. In case a program is missing, it can be installed at any later time.
-
 \listoffigures
 
-\nocite{why05}
 \nocite{fowler10}
-\nocite{upt02}
 \nocite{dragonbook06}
 \nocite{louden03}
 
-%\bibliographystyle{plain}
 \printbibliography
 
 \end{document}
