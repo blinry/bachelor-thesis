@@ -1,4 +1,4 @@
-\documentclass[paper=a4,twoside,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,12pt,appendixprefix=true]{scrreprt}
+\documentclass[paper=a4,abstract=on,cleardoublepage=empty,numbers=noenddot,toc=bib,12pt,appendixprefix=true]{scrreprt}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -13,6 +13,7 @@
     \definecolor{medium-blue}{rgb}{0,0,0.5}
 \usepackage{multicol} % multiple-column environment
 \usepackage{graphicx} % include graphics
+\usepackage{enumitem} % for denser lists
 \usepackage{pgfplots, pgfplotstable} % draw pretty plots
     \pgfplotsset{compat=1.8}
     \usepgfplotslibrary{statistics}
@@ -102,7 +103,7 @@
 
 \titlehead{\includegraphics[height=2cm]{tu-logo.pdf} \hfill \includegraphics[height=2cm]{ips.pdf}}
 
-\subject{\normalfont Bachelor Thesis}
+\subject{\normalfont Bachelor Thesis: The Director's Cut}
 \title{The Nut Shell -- A Framework for Creating Interactive Command Line Tutorials}
 \author{Sebastian Morr}
 \date{2013--11--03}
@@ -129,20 +130,6 @@ Advisor: Dr. Werner Struckmann}
     In a two-week evaluation study with about 120 participants, a tutorial created with the Nut Shell proved superior to a teaching method based on static text: Users of the Nut Shell showed a much higher motivation to attend to the course, said they had more fun and learned more, and were able to work more autonomously.
 \end{abstract}
 
-\selectlanguage{ngerman}%
-\begin{abstract}
-    Kommandozeilen-Interfaces sind eine mächtige, ausdrucksstarke Art und Weise, mit Computern zu interagieren, sie haben allerdings eine steilere Lernkurve als grafische Inferfaces. Diese Bachelorarbeit stellt ein neuartiges Interfacekonzept zum Lehren von Kommandozeilen-Programmen vor, das durch Textadventures inspiriert ist: Eine interaktive, Terminal-basierte Lernumgebung, deren Anleitungstext auf die Befehle des Benutzers, auf die Antwort der Kommandozeile sowie ihren internen Zustand reagiert.
-
-    Die Arbeit umfasst Design, Implementierung, Anwendung und Evaluierung der \emph{Nut Shell}, einem Softwareframework zum Erstellen solcher Tutorials.
-
-    Eine Abstraktionsschicht wird entworfen, die dem Framework einheitlichen Zugriff auf die verschiedenen Bestandteile der Interaktion innerhalb beliebiger Kommandozeilenproramme erlaubt, wobei deren eingebaute Editierfunktionen benutzbar bleiben. Das Framework ist kompatibel mit System-Shells und vielen interpretierten Programmiersprachen, kann aber auch verwendet werden, um Unterthemen zu lehren, wie etwa spezielle Kommandozeilenwerkzeuge oder -konzepte.
-
-    Für die Nut Shell wurde eine neue domänenspezifische Sprache entwickelt, in der die Tutoriallektionen geschrieben werden können. Die syntaktischen Strukturen der Sprache sind für diesen Zweck maßgeschneidert und machen deshalb das Erstellen von Inhalten schnell und einfach. Eine eingebaute Test-Infrastruktur ermöglicht es Autoren, ihre Tutorials automatisch auf korrekte Funktionsweise zu überprüfen.
-
-    In einer zweiwöchigen Auswertung mit etwa 120 Teilnehmern zeigte ein mit der Nut Shell erstelltes Tutorial klare Vorteile gegenüber einem Lehransatz, der auf statischem Text basierte: Benutzer der Nut Shell waren motivierter, an dem Kurs teilzunehmen, sie hatten mehr Spaß, lernten mehr, und konnten selbstständiger arbeiten.
-\end{abstract}
-\selectlanguage{english}%
-
 \cleardoublepage
 
 \section*{Acknowledgments}
@@ -159,17 +146,6 @@ And finally, I want to thank the 120 students who bravely participated in the fi
 \section*{Colophon}
 
 This document was created using \LaTeXe\ by Leslie Lamport and contributors, and \KOMAScript\ by Frank Neukam, Markus Kohm, and Axel Kielhorn. The figures were created using PGFPlots by Christian Feuersänger and Ti\textit{k}Z by Till Tantau, the key combinations were produced with \emph{menukeys} by Tobias Weh. The text is set in the Latin Modern font family by Bogusław Jackowski, Janusz M. Nowacki and Marcin Woliński, the monospaced font is \texttt{Bera Mono}, based on Bitstream Vera.
-
-\section*{Affidavit}
-
-This thesis is my own unaided work. All sources are acknowledged as references.
-
-\noindent
-Ich habe diese Abschlussarbeit selbstständig verfasst. Alle Quellen wurden angegeben.
-\\\\
-\vskip 5mm
-Braunschweig, 2013--11--03
-\hskip 1cm \dotfill
 
 \setcounter{tocdepth}{2}
 \tableofcontents
@@ -442,7 +418,7 @@ Unfortunately, this is only true for visible characters. While editing the comma
 
 When the user is done editing the command, wants to run it and produces a \emph{line feed} character by pressing \keys{Return}, the Nut Shell does not send this character to the process. Instead, it proceeds in the following way:
 
-\begin{enumerate}
+\begin{enumerate}[itemsep=1mm]
     \item The cursor is positioned at the end of the line using \keys{\ctrl+E}. This is necessary as the user could have positioned the cursor somewhere inside the command.
     \item A \emph{space} character is inserted. This prevents problems when the command was completely empty before, as the following step would not do anything in this case.
     \item The whole line is deleted and put into an internal buffer using \mbox{\keys{\ctrl+U}}.
@@ -687,6 +663,8 @@ if "test" == "test" {
 \minisec{Prompt statements}
 
 The prompt statement is another central element of \emph{nutsh}'s syntax. It has the semantic of an endless loop, in which a command is read from the user at the beginning of each pass. This way, it can be used to represent a state in the tutorial, in which the user can execute commands. The prompt loop can be left with a \texttt{break} statement.
+
+\newpage
 
 \begin{ebnf}
 PromptStatement = "prompt" Block .
@@ -1393,8 +1371,6 @@ The following lessons were part of the preparatory course:
         \item Automation with makefiles
     \end{enumerate}
 \end{multicols}
-
-\listoffigures
 
 \nocite{fowler10}
 \nocite{dragonbook06}
